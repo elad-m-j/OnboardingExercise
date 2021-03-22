@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Image cell in gallery mainly handles the spinner animation
 class ImageCell: UICollectionViewCell {
     
     @IBOutlet weak var image: UIImageView!

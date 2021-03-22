@@ -6,10 +6,6 @@ class LinksViewController: UIViewController {
     @IBOutlet weak var linksTableView: UITableView!
     
     var links = [ImageLink]()
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    /// load the links from CoreData
     private let linksPresenter = LinksPresenter()
     
     override func viewDidLoad() {
@@ -19,10 +15,11 @@ class LinksViewController: UIViewController {
         linksTableView.dataSource = self
         linksPresenter.delegate = self
         
-        linksPresenter.loadLinks(fromContext: context)
+        linksPresenter.loadLinks()
     }
 }
 
+// MARK: - TableView Data Source
 extension LinksViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -35,12 +32,11 @@ extension LinksViewController: UITableViewDataSource {
         cell.linkLabel.text = imageLink.linkURL
         return cell
     }
-
 }
 
+// MARK: - Open link on press
 extension LinksViewController: UITableViewDelegate {
     
-    /// opens a link in Safari browser
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let selectedLinkURL = links[indexPath.row].linkURL,
            let url = URL(string: selectedLinkURL) {
@@ -51,10 +47,11 @@ extension LinksViewController: UITableViewDelegate {
     }
 }
 
-extension LinksViewController: LinksViewControllerDelegate {
+// MARK: - Presenter Delegate
+extension LinksViewController: LinksPresenterDelegate {
     
     /// displays the links retrieved by presenter
-    func displayLinks(fromPresenter imageLinks: [ImageLink]) {
+    func displayLinks(imageLinks: [ImageLink]) {
         links = imageLinks
         linksTableView.reloadData()
     }

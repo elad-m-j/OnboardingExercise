@@ -1,92 +1,55 @@
 import UIKit
 import CoreData
 
-protocol NetworkServiceDelegate {
-    func didUploadImageLink(_ networkManager: NetworkService, cellOfImage: ImageCell)
-    func didFailWithError(error: Error?, additionalMessage: String,
-                          _ cellOfImage: ImageCell)
-}
-
-class NetworkService: ObservableObject {
+/// make post requests of image data (as base64String) to Imgur, and returns via closure the posted image's url
+class NetworkService {
     
     private let anonymousImgurUploadURL = URL(string: "https://api.imgur.com/3/image")
     
-    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    var delegate: NetworkServiceDelegate?
-     
-    func testDataModel(_ string: String){
-        let imageLinkDataObject = ImageLink(context: self.context)
-        imageLinkDataObject.linkURL = string
-        imageLinkDataObject.deleteHash = "Whatever"
-        self.saveLink()
-    }
-    
-    func getBase64Image(image: UIImage) -> String? {
-        let imageData = image.pngData()
-        let base64Image = imageData?.base64EncodedString(options: .lineLength64Characters)
-        return base64Image
-    }
-    
-    func uploadImageToImgur(withUIImage image: UIImage, cellOfImage imageCell: ImageCell) {
-        if let base64Image = getBase64Image(image: image),
-           let request = getURLRequest(withImageAsString: base64Image) {
+    func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (String) -> (), errorCallback: @escaping (Error?, String) -> ()) {
+        if let request = getURLRequest(withImageAsString: base64Image) {
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    self.delegate?.didFailWithError(error: error, additionalMessage: "Data task error", imageCell)
+                    errorCallback(error, "Data task error")
                     return
                 }
                 if let response = response as? HTTPURLResponse {
                     if !((200...299).contains(response.statusCode)){
-                        self.delegate?.didFailWithError(error: nil, additionalMessage: "server error \(response.statusCode)", imageCell)
+                        errorCallback(nil, "server error \(response.statusCode)")
                         return
                     } // else continue
                 } else {
-                    self.delegate?.didFailWithError(error: nil, additionalMessage: "Could not convert response to HTTPURLResponse", imageCell)
+                    errorCallback(nil, "Could not convert response to HTTPURLResponse")
                 }
                 
-                if let mimeType = response?.mimeType, mimeType == "application/json", let data = data, let dataString = String(data: data, encoding: .utf8) {
+                if let mimeType = response?.mimeType,
+                   mimeType == "application/json",
+                   let data = data,
+                   let dataString = String(data: data, encoding: .utf8) {
+                    self.parseResultLinks(fromData: data, completion: completion)
                     print("---imgur upload results: \(dataString)")
-                    if let parsedImageLink = self.parseResultLinks(fromData: data){
-                        self.saveLink()
-                        self.delegate?.didUploadImageLink(self,
-                                                        cellOfImage: imageCell)
-                    } else {
-                        self.delegate?.didFailWithError(error: nil, additionalMessage: "Failed parsing data, link or delete hash", imageCell)
-                    }
                 } else {
-                    self.delegate?.didFailWithError(error: nil, additionalMessage: "error with mime type, nil data or encoding data as string", imageCell)
+                    errorCallback(nil, "error with mime type, nil data or encoding data as string")
                 }
             }.resume()
         }
     }
     
-    private func saveLink() {
-        do {
-            try self.context.save()
-        } catch  {
-            print("Error saving link to context \(error)")
-        }
-    }
-    
-    private func parseResultLinks(fromData data: Data) -> ImageLink? {
+    private func parseResultLinks(fromData data: Data, completion: (String) -> ()) {
         let parsedResult: [String: AnyObject]
         do {
             parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: AnyObject]
             if let dataJson = parsedResult["data"] as? [String: Any],
-               let imageURLLink = dataJson["link"] as? String,
-               let deleteHash = dataJson["deletehash"] as? String {
-                let imageLinkDataObject = ImageLink(context: self.context)
-                imageLinkDataObject.linkURL = imageURLLink
-                imageLinkDataObject.deleteHash = deleteHash
-                return imageLinkDataObject
+               let imageURLLink = dataJson["link"] as? String {
+                completion(imageURLLink)
+                return
             } else {
                 print( "Could not parse data, image link or deleteHash")
-                return nil
+                return
             }
         } catch {
             print ("json serialization failed: \(error)")
-            return nil
+            return
         }
     }
     

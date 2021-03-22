@@ -1,90 +1,45 @@
 import UIKit
 import Photos
 
+/// Shows all photos in user's Photos Gallery
 class GalleryCollectionViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
     
     var userPhotoAssets: PHFetchResult<PHAsset>? = nil
-    let bobImage = UIImage.init(imageLiteralResourceName: "bob")
     
-    var networkManager = NetworkService()
-    private var galleyPresenter = GalleryPresenter(with: NetworkService())
-    let marginForCell: CGFloat = 5
+    private var galleryPresenter = GalleryPresenter(with: NetworkService())
     var imagesPerRow = 3.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
-        fetchPhotoCollection()
+        galleryPresenter.delegate = self
+        galleryPresenter.fetchPhotoCollection()
         collectionView.delegate = self
         collectionView.dataSource = self
-        
-        networkManager.delegate = self
-        
     }
     
-    // MARK: - Cell size setting
+    /// Cell resizing when orientation changes
     override func viewWillTransition(to size: CGSize,
-                                     with coordinator: UIViewControllerTransitionCoordinator) {
+            with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with:coordinator)
-        if size.height >= size.width {
-            imagesPerRow = 3.0
-        } else {
-            imagesPerRow = 5.0
-        }
-        coordinator.animate { (_) in
-            // calls sizeForItemAt
+        imagesPerRow = size.height >= size.width ? 3.0 : 5.0
+        coordinator.animate { _ in
+            // calls sizeForItemAt eventually
             self.collectionView.collectionViewLayout.invalidateLayout()
-        } completion: { (_) in
-        }
-
+        } completion: { _ in }
     }
     
-    private func setCellsSize(){
-        guard let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {return}
-        flowLayout.minimumInteritemSpacing = marginForCell
-        flowLayout.minimumLineSpacing = marginForCell
-        flowLayout.sectionInset = UIEdgeInsets(top: marginForCell, left: marginForCell, bottom: marginForCell, right: marginForCell)
-        
-    }
-    
-    // MARK: - fetching user photos
-    private func fetchPhotoCollection(){
-        PHPhotoLibrary.requestAuthorization { (status) in
-            DispatchQueue.main.async {
-                switch status {
-                    case .authorized:
-                        print("Authorized")
-                        self.authorizedFetch()
-                    case .denied, .restricted:
-                        print("Not allowed")
-                    case .notDetermined:
-                        print("Not determined yet")
-                    case .limited:
-                        print("Limited access")
-                    @unknown default:
-                        print("default case in permissions")
-                }
-            }
-        }
-    }
-    
-    private func authorizedFetch(){
-        let photosCollection: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: nil)
-        self.userPhotoAssets = photosCollection
-        self.collectionView.reloadData()
-    }
-    
-    // MARK: - Navigation
+    /// Navigation to links screen
     @IBAction func linksPressed(_ sender: UIBarButtonItem) {
         performSegue(withIdentifier: Constants.segueLinksIdentifier, sender: self)
     }
 }
 
+// MARK: - Images Per Row Constraint with  FlowLayout
 extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
-    /// Handles the images per row constraint
+
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let numberOfCellsInRow = imagesPerRow   //number of columns you want
@@ -98,7 +53,7 @@ extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
     
 }
 
-// MARK: - Data source and view layout
+// MARK: - Data source
 extension GalleryCollectionViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -111,24 +66,33 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
         let photoAsset = userPhotoAssets?.object(at: indexPath.row)
         cell.image.fetchImageFrom(asset: photoAsset, contentMode: .aspectFill, targetSize: cell.image.frame.size)
         
-        cell.image.image = bobImage
         return cell
     }
 }
 
+// MARK: - Clicking an image/cell
 extension GalleryCollectionViewController: UICollectionViewDelegate {
+    
+    private func getBase64Image(image: UIImage) -> String? {
+        let imageData = image.pngData()
+        let base64Image = imageData?.base64EncodedString(options: .lineLength64Characters)
+        return base64Image
+    }
     
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         print("cell number \(indexPath.row) was pressed")
         if let photoAsset = userPhotoAssets?.object(at: indexPath.row),
-           let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCell{
+           let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCell {
             let options = PHImageRequestOptions()
             options.version = .original
             PHImageManager.default().requestImage(for: photoAsset, targetSize: CGSize(width: 300, height: 300), contentMode: .default, options: options) { (image, _) in
-                guard let image = image else {return}
-                imageCell.startAnimatingSpinner()
-                self.networkManager.uploadImageToImgur(withUIImage: image, cellOfImage: imageCell)
+                print("in request")
+                if let image = image,
+                   let base64Image = self.getBase64Image(image: image) {
+                    imageCell.startAnimatingSpinner()
+                    self.galleryPresenter.uploadImageToImgur(withBase64StringAsImage: base64Image, cellOfImage: imageCell)
+                }
             }
         } else {
             print("Failed retrieving asset from collection")
@@ -136,10 +100,15 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
     }
 }
 
-// MARK: - Network
-extension GalleryCollectionViewController: NetworkServiceDelegate {
+// MARK: - Presenter Delegate
+extension GalleryCollectionViewController: GalleryPresenterDelegate {
     
-    func didUploadImageLink(_ networkManager: NetworkService, cellOfImage: ImageCell) {
+    func setAssets(photoAssets: PHFetchResult<PHAsset>){
+        self.userPhotoAssets = photoAssets
+        self.collectionView.reloadData()
+    }
+    
+    func didUploadImageLink(cellOfImage: ImageCell) {
         DispatchQueue.main.async {
             cellOfImage.stopAnimatingSpinner()
         }

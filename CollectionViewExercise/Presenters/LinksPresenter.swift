@@ -8,19 +8,21 @@
 import Foundation
 import CoreData
 
-protocol LinksViewControllerDelegate: NSObjectProtocol {
-    func displayLinks(fromPresenter imageLinks: [ImageLink])
+protocol LinksPresenterDelegate: NSObjectProtocol {
+    func displayLinks(imageLinks: [ImageLink])
 }
 
+/// connects the LinksViewController and the LinksDataService (i.e. saving links)
 class LinksPresenter {
     
-    weak var delegate: LinksViewControllerDelegate?
+    weak var delegate: LinksPresenterDelegate?
     
-    func loadLinks(fromContext context: NSManagedObjectContext){
+    func loadLinks(){
         let request: NSFetchRequest<ImageLink> = ImageLink.fetchRequest()
         do {
+            let context = LinksDataService.shared.persistentContainer.viewContext
             let links = try context.fetch(request)
-            delegate?.displayLinks(fromPresenter: links)
+            delegate?.displayLinks(imageLinks: links)
         } catch {
             print("Error fetching links from database\(error)")
         }

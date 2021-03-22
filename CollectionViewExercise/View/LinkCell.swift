@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// a link line in the table view
 class LinkCell: UITableViewCell {
 
     @IBOutlet weak var linkLabel: UILabel!
