@@ -8,29 +8,38 @@ class GalleryCollectionViewController: UIViewController {
     var userPhotoAssets: PHFetchResult<PHAsset>? = nil
     let bobImage = UIImage.init(imageLiteralResourceName: "bob")
     
-    var networkManager = NetworkManager()
+    var networkManager = NetworkService()
+    private var galleyPresenter = GalleryPresenter(with: NetworkService())
     let marginForCell: CGFloat = 5
-    var imagesPerRow = 3
+    var imagesPerRow = 3.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         fetchPhotoCollection()
         collectionView.delegate = self
         collectionView.dataSource = self
+        
         networkManager.delegate = self
         
-        setCellsSize()
     }
     
     // MARK: - Cell size setting
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize,
+                                     with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with:coordinator)
-        if size.height >= size.width { // portrait (?)
-            imagesPerRow = 3
+        if size.height >= size.width {
+            imagesPerRow = 3.0
         } else {
-            imagesPerRow = 5
+            imagesPerRow = 5.0
         }
+        coordinator.animate { (_) in
+            // calls sizeForItemAt
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        } completion: { (_) in
+        }
+
     }
     
     private func setCellsSize(){
@@ -38,6 +47,7 @@ class GalleryCollectionViewController: UIViewController {
         flowLayout.minimumInteritemSpacing = marginForCell
         flowLayout.minimumLineSpacing = marginForCell
         flowLayout.sectionInset = UIEdgeInsets(top: marginForCell, left: marginForCell, bottom: marginForCell, right: marginForCell)
+        
     }
     
     // MARK: - fetching user photos
@@ -73,8 +83,23 @@ class GalleryCollectionViewController: UIViewController {
     }
 }
 
+extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
+    /// Handles the images per row constraint
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let numberOfCellsInRow = imagesPerRow   //number of columns you want
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let totalSpace = flowLayout.sectionInset.left
+            + flowLayout.sectionInset.right
+            + (flowLayout.minimumInteritemSpacing * CGFloat(numberOfCellsInRow - 1))
+        let squareWidth = Int((collectionView.bounds.width - totalSpace) / CGFloat(numberOfCellsInRow))
+        return CGSize(width: squareWidth, height: squareWidth)
+    }
+    
+}
+
 // MARK: - Data source and view layout
-extension GalleryCollectionViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension GalleryCollectionViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return userPhotoAssets?.count ?? -1
@@ -82,65 +107,62 @@ extension GalleryCollectionViewController: UICollectionViewDataSource, UICollect
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.imageCellReuseIdentifier, for: indexPath) as! ImageCell
-        let photoAsset = userPhotoAssets?.object(at: indexPath.row)
         
+        let photoAsset = userPhotoAssets?.object(at: indexPath.row)
         cell.image.fetchImageFrom(asset: photoAsset, contentMode: .aspectFill, targetSize: cell.image.frame.size)
+        
+        cell.image.image = bobImage
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-
-        let noOfCellsInRow = imagesPerRow   //number of column you want
-        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        let totalSpace = flowLayout.sectionInset.left
-            + flowLayout.sectionInset.right
-            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
-
-        let size = Int((collectionView.bounds.width - totalSpace) / CGFloat(noOfCellsInRow))
-        return CGSize(width: size, height: size)
     }
 }
 
 extension GalleryCollectionViewController: UICollectionViewDelegate {
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
         print("cell number \(indexPath.row) was pressed")
-        if let photoAsset = userPhotoAssets?.object(at: indexPath.row){
+        if let photoAsset = userPhotoAssets?.object(at: indexPath.row),
+           let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCell{
             let options = PHImageRequestOptions()
             options.version = .original
-            PHImageManager.default().requestImage(for: photoAsset, targetSize: CGSize(width: 150, height: 150), contentMode: .aspectFit, options: options) { (image, _) in
+            PHImageManager.default().requestImage(for: photoAsset, targetSize: CGSize(width: 300, height: 300), contentMode: .default, options: options) { (image, _) in
                 guard let image = image else {return}
-                self.networkManager.uploadImageToImgur(image: image)
-//                self.networkManager.requestImage()
+                imageCell.startAnimatingSpinner()
+                self.networkManager.uploadImageToImgur(withUIImage: image, cellOfImage: imageCell)
             }
         } else {
-            print("Failed retreiving asset from collection")
+            print("Failed retrieving asset from collection")
         }
-        
-        //spinner load
-        // error message
-        // link to save in network delegate
     }
 }
 
 // MARK: - Network
-extension GalleryCollectionViewController: NetworkManagerDelegate {
-    func didImageLinkUpload(_ networkManager: NetworkManager, imageLink: ImageLink) {
-        // should save link here somehow
-//        print(imageLink)
+extension GalleryCollectionViewController: NetworkServiceDelegate {
+    
+    func didUploadImageLink(_ networkManager: NetworkService, cellOfImage: ImageCell) {
+        DispatchQueue.main.async {
+            cellOfImage.stopAnimatingSpinner()
+        }
     }
     
-    func didFailWithError(error: Error) {
-        print(error)
+    func didFailWithError(error: Error?, additionalMessage: String, _ cellOfImage: ImageCell) {
+        DispatchQueue.main.async {
+            print(additionalMessage)
+            print(error ?? "")
+            let alert = UIAlertController(title: "Upload Failed", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+            }))
+            self.present(alert, animated: true, completion: nil)
+            cellOfImage.stopAnimatingSpinner()
+        }
     }
-    
-    
 }
 
 // MARK: - Fetch UIImage from asset
 extension UIImageView{
     
     func fetchImageFrom(asset: PHAsset?, contentMode: PHImageContentMode, targetSize:CGSize) {
+        
         if asset == nil {
             return // doesn't seem swifty enough
         } else {
@@ -148,15 +170,16 @@ extension UIImageView{
             options.version = .original
             PHImageManager.default().requestImage(for: asset!,
                                                   targetSize: targetSize,
-                                                  contentMode: contentMode,
-                                                  options: options) { (image, _) in
+                                                  contentMode: .aspectFill,
+                                                  options: options) {
+                (image, _) in
                 guard let image = image else {return}
                 switch contentMode {
                     case .aspectFill:
                         self.contentMode = .scaleAspectFill
                     case .aspectFit:
                         self.contentMode = .scaleAspectFit
-                    @unknown default:
+                    default:
                         print("non existent image content mode")
                 }
                 DispatchQueue.main.async {
@@ -166,3 +189,4 @@ extension UIImageView{
         }
     }
 }
+
