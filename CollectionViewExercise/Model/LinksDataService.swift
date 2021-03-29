@@ -13,6 +13,8 @@ class LinksDataService {
 
     static let shared = LinksDataService()
     
+    private init(){}
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "DataModel")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -23,7 +25,6 @@ class LinksDataService {
         return container
     }()
     
-    private init(){}
 
     func saveContext () {
         let context = persistentContainer.viewContext

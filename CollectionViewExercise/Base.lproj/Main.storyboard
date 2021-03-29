@@ -40,10 +40,8 @@
                                             </subviews>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
-                                                <constraint firstItem="tYN-0R-cdB" firstAttribute="centerX" secondItem="14v-RU-nC8" secondAttribute="centerX" id="MI1-N6-WGl"/>
                                                 <constraint firstItem="tYN-0R-cdB" firstAttribute="leading" secondItem="14v-RU-nC8" secondAttribute="leading" id="Tw0-wQ-4gS"/>
                                                 <constraint firstItem="tYN-0R-cdB" firstAttribute="top" secondItem="14v-RU-nC8" secondAttribute="top" id="YCM-SZ-ke4"/>
-                                                <constraint firstItem="tYN-0R-cdB" firstAttribute="centerY" secondItem="14v-RU-nC8" secondAttribute="centerY" id="kGg-ZN-imH"/>
                                                 <constraint firstAttribute="bottom" secondItem="tYN-0R-cdB" secondAttribute="bottom" id="tDz-wg-nt9"/>
                                                 <constraint firstAttribute="trailing" secondItem="tYN-0R-cdB" secondAttribute="trailing" id="zb5-Pk-6SR"/>
                                             </constraints>
@@ -92,30 +90,13 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="774"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LinkCell" id="1Ld-wp-qMx" customClass="LinkCell" customModule="CollectionViewExercise" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="63"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LinkCell" id="1Ld-wp-qMx">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1Ld-wp-qMx" id="FBq-KR-ccL">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="63"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7BA-W7-GIR">
-                                                    <rect key="frame" x="30" y="21" width="354" height="21"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="7BA-W7-GIR" secondAttribute="trailing" constant="10" id="8yE-LQ-OD6"/>
-                                                <constraint firstItem="7BA-W7-GIR" firstAttribute="top" secondItem="FBq-KR-ccL" secondAttribute="topMargin" constant="10" id="RiT-De-xGQ"/>
-                                                <constraint firstItem="7BA-W7-GIR" firstAttribute="leading" secondItem="FBq-KR-ccL" secondAttribute="leadingMargin" constant="10" id="Woz-ET-LrA"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="7BA-W7-GIR" secondAttribute="bottom" constant="10" id="coA-XD-LUj"/>
-                                            </constraints>
                                         </tableViewCellContentView>
-                                        <connections>
-                                            <outlet property="linkLabel" destination="7BA-W7-GIR" id="b1W-g5-AIL"/>
-                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>

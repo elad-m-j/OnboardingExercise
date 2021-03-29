@@ -6,14 +6,14 @@ class LinksViewController: UIViewController {
     @IBOutlet weak var linksTableView: UITableView!
     
     var links = [ImageLink]()
-    private let linksPresenter = LinksPresenter()
+    private var linksPresenter: LinkPresenterProtocol = LinksPresenter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         linksTableView.delegate = self
         linksTableView.dataSource = self
-        linksPresenter.delegate = self
+        linksPresenter.view = self
         
         linksPresenter.loadLinks()
     }
@@ -27,9 +27,9 @@ extension LinksViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "LinkCell", for: indexPath) as! LinkCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "LinkCell", for: indexPath) as UITableViewCell
         let imageLink = links[indexPath.row]
-        cell.linkLabel.text = imageLink.linkURL
+        cell.textLabel?.text = imageLink.linkURL
         return cell
     }
 }

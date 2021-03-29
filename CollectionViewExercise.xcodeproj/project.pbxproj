@@ -18,10 +18,11 @@
 		9977C80F25FE4D5E000E994E /* LinksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9977C80E25FE4D5E000E994E /* LinksViewController.swift */; };
 		9977C83425FE708A000E994E /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9977C83325FE708A000E994E /* NetworkService.swift */; };
 		9977C845260274DE000E994E /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9977C843260274DD000E994E /* DataModel.xcdatamodeld */; };
-		9977C85226036A15000E994E /* LinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9977C85126036A15000E994E /* LinkCell.swift */; };
 		99B30F052608ACC70009FC0F /* LinksPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F042608ACC70009FC0F /* LinksPresenter.swift */; };
 		99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */; };
 		99B30F0D2608E3FD0009FC0F /* LinksDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */; };
+		99C711BF2611ECD200254CEF /* ImageUploadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */; };
+		99DC50CC260B72E5004944F4 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99DC50CB260B72E5004944F4 /* NetworkError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,10 +39,11 @@
 		9977C80E25FE4D5E000E994E /* LinksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksViewController.swift; sourceTree = "<group>"; };
 		9977C83325FE708A000E994E /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		9977C844260274DD000E994E /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
-		9977C85126036A15000E994E /* LinkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkCell.swift; sourceTree = "<group>"; };
 		99B30F042608ACC70009FC0F /* LinksPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksPresenter.swift; sourceTree = "<group>"; };
 		99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryPresenter.swift; sourceTree = "<group>"; };
 		99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksDataService.swift; sourceTree = "<group>"; };
+		99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadOperation.swift; sourceTree = "<group>"; };
+		99DC50CB260B72E5004944F4 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 				9977C843260274DD000E994E /* DataModel.xcdatamodeld */,
 				9977C83325FE708A000E994E /* NetworkService.swift */,
 				99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */,
+				99DC50CB260B72E5004944F4 /* NetworkError.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -104,7 +107,6 @@
 				9902D03125FA68FB00B3B9D6 /* GalleryCollectionViewController.swift */,
 				9977C80E25FE4D5E000E994E /* LinksViewController.swift */,
 				9902D02825FA61F000B3B9D6 /* ImageCell.swift */,
-				9977C85126036A15000E994E /* LinkCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -114,6 +116,7 @@
 			children = (
 				99B30F042608ACC70009FC0F /* LinksPresenter.swift */,
 				99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */,
+				99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */,
 			);
 			path = Presenters;
 			sourceTree = "<group>";
@@ -192,12 +195,13 @@
 				99B30F0D2608E3FD0009FC0F /* LinksDataService.swift in Sources */,
 				9977C845260274DE000E994E /* DataModel.xcdatamodeld in Sources */,
 				9902D01225FA5E5D00B3B9D6 /* AppDelegate.swift in Sources */,
+				99C711BF2611ECD200254CEF /* ImageUploadOperation.swift in Sources */,
 				9977C80B25FE19E7000E994E /* APICredentials.swift in Sources */,
 				99B30F052608ACC70009FC0F /* LinksPresenter.swift in Sources */,
 				99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */,
 				9902D02925FA61F000B3B9D6 /* ImageCell.swift in Sources */,
-				9977C85226036A15000E994E /* LinkCell.swift in Sources */,
 				9977C80F25FE4D5E000E994E /* LinksViewController.swift in Sources */,
+				99DC50CC260B72E5004944F4 /* NetworkError.swift in Sources */,
 				9902D03625FA6E6E00B3B9D6 /* Constants.swift in Sources */,
 				9977C83425FE708A000E994E /* NetworkService.swift in Sources */,
 			);
@@ -347,6 +351,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WTDX82D4HW;
 				INFOPLIST_FILE = CollectionViewExercise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -366,6 +371,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WTDX82D4HW;
 				INFOPLIST_FILE = CollectionViewExercise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (

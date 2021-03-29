@@ -4,76 +4,68 @@ import CoreData
 /// make post requests of image data (as base64String) to Imgur, and returns via closure the posted image's url
 class NetworkService {
     
-    private let anonymousImgurUploadURL = URL(string: "https://api.imgur.com/3/image")
+    static let shared = NetworkService()
     
-    func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (String) -> (), errorCallback: @escaping (Error?, String) -> ()) {
+    private init(){}
+    
+    private let anonymousImgurUploadURL = "https://api.imgur.com/3/image"
+    typealias NetworkResult = Result<String, NetworkError>
+    
+    
+    func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ()) {
         if let request = getURLRequest(withImageAsString: base64Image) {
             URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    errorCallback(error, "Data task error")
-                    return
+                if let error = error,
+                   let errorCode = response as? HTTPURLResponse {
+                    completion(.failure(NetworkError(with: error, description: "Data task error with code: \(errorCode)")))
                 }
-                if let response = response as? HTTPURLResponse {
-                    if !((200...299).contains(response.statusCode)){
-                        errorCallback(nil, "server error \(response.statusCode)")
-                        return
-                    } // else continue
-                } else {
-                    errorCallback(nil, "Could not convert response to HTTPURLResponse")
-                }
-                
                 if let mimeType = response?.mimeType,
                    mimeType == "application/json",
                    let data = data,
                    let dataString = String(data: data, encoding: .utf8) {
-                    self.parseResultLinks(fromData: data, completion: completion)
+                    completion(self.parseResultLinks(fromData: data))
                     print("---imgur upload results: \(dataString)")
                 } else {
-                    errorCallback(nil, "error with mime type, nil data or encoding data as string")
+                    completion(.failure(NetworkError(with: nil, description: "error with mime type, nil data or encoding data as string")))
                 }
             }.resume()
         }
     }
     
-    private func parseResultLinks(fromData data: Data, completion: (String) -> ()) {
-        let parsedResult: [String: AnyObject]
+    private func parseResultLinks(fromData data: Data) -> NetworkResult {
+        
         do {
-            parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: AnyObject]
-            if let dataJson = parsedResult["data"] as? [String: Any],
+            if let parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: AnyObject],
+               let dataJson = parsedResult["data"] as? [String: Any],
                let imageURLLink = dataJson["link"] as? String {
-                completion(imageURLLink)
-                return
+                return .success(imageURLLink)
             } else {
-                print( "Could not parse data, image link or deleteHash")
-                return
+                return .failure(NetworkError(with: nil, description: "Could not parse data, image link or deleteHash"))
             }
         } catch {
-            print ("json serialization failed: \(error)")
-            return
+            return .failure(NetworkError(with: nil, description: "json serialization failed: \(error)"))
         }
     }
     
-    private func getURLRequest(withImageAsString base64Image: String?) -> URLRequest? {
-        if let base64Image = base64Image {
-            
-            let boundary = "Boundary-\(UUID().uuidString)"
-            var request = URLRequest(url: anonymousImgurUploadURL!)
-            request.addValue("Client-ID \(APICredentials.clientID)", forHTTPHeaderField: "Authorization")
-            request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "POST"
-            
-            var body = ""
-            body += "--\(boundary)\r\n"
-            body += "Content-Disposition:form-data; name=\"image\""
-            body += "\r\n\r\n\(base64Image)\r\n"
-            body += "--\(boundary)--\r\n"
-            let postData = body.data(using: .utf8)
-            request.httpBody = postData
-            return request
-        } else {
-            print("Error converting image to base64")
-            return nil
-        }
+    private func getURLRequest(withImageAsString base64Image: String) -> URLRequest? {
+        guard let url = URL(string: anonymousImgurUploadURL) else { return nil}
+        
+        var request = URLRequest(url: url)
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.addValue("Client-ID \(APICredentials.clientID)", forHTTPHeaderField: "Authorization")
+        request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        
+        var body = ""
+        body += "--\(boundary)\r\n"
+        body += "Content-Disposition:form-data; name=\"image\""
+        body += "\r\n\r\n\(base64Image)\r\n"
+        body += "--\(boundary)--\r\n"
+        let postData = body.data(using: .utf8)
+        
+        request.httpBody = postData
+        return request
+        
     }
 }
 

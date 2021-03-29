@@ -12,17 +12,22 @@ protocol LinksPresenterDelegate: NSObjectProtocol {
     func displayLinks(imageLinks: [ImageLink])
 }
 
+protocol LinkPresenterProtocol {
+    var view: LinksPresenterDelegate? { get set }
+    func loadLinks()
+}
+
 /// connects the LinksViewController and the LinksDataService (i.e. saving links)
-class LinksPresenter {
+class LinksPresenter: LinkPresenterProtocol {
     
-    weak var delegate: LinksPresenterDelegate?
+    weak var view: LinksPresenterDelegate?
     
     func loadLinks(){
         let request: NSFetchRequest<ImageLink> = ImageLink.fetchRequest()
         do {
             let context = LinksDataService.shared.persistentContainer.viewContext
             let links = try context.fetch(request)
-            delegate?.displayLinks(imageLinks: links)
+            view?.displayLinks(imageLinks: links)
         } catch {
             print("Error fetching links from database\(error)")
         }
