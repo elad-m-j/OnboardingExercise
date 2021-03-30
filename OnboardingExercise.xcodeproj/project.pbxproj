@@ -76,8 +76,8 @@
 		9902D01025FA5E5D00B3B9D6 /* OnboardingExercise */ = {
 			isa = PBXGroup;
 			children = (
-				99B30F032608ACA60009FC0F /* Presenters */,
 				9977C83925FE7391000E994E /* Model */,
+				99B30F032608ACA60009FC0F /* Presenters */,
 				9977C84C260341E2000E994E /* View */,
 				99C711C2261357E900254CEF /* Storyboards */,
 				9902D01A25FA5E6000B3B9D6 /* Assets.xcassets */,

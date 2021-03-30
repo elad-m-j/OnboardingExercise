@@ -69,6 +69,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
             return cell
         } else {
             // ? a better approach for the fail case?
+            print("📕", "No cell for index: \(indexPath.row) in: cellForItemAt. Creating new ImageCell")
             return ImageCell()
         }
         
@@ -102,7 +103,10 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
         DispatchQueue.main.async {
             if let cell = self.collectionView.cellForItem(at: indexPath) as? ImageCell {
                     cell.stopAnimatingSpinner()
-            } // else, cell is not visible and animation stops in prepareForReuse anyway
+            } else {
+                print("No cell for index: \(indexPath) in: didUploadImageLink")
+                self.collectionView.reloadItems(at: [indexPath])
+            }
         }
     }
     
@@ -118,6 +122,7 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
                     cell.stopAnimatingSpinner()
             } else {
                 print("📕", "No cell for index: \(indexPath.row) in: didFailWithError")
+                self.collectionView.reloadItems(at: [indexPath])
             }
         }
     }

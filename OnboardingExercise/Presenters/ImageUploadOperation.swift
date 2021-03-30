@@ -49,13 +49,13 @@ class ImageUploadOperation: Operation {
         guard !isCancelled else { return }
         state = .executing
         
-        print("'uploading' image from cell: \(index)")
+        print("uploading image from cell: \(index)")
         
         NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
             [weak self] (uploadResult) in
             guard let self = self else { return } // self stays until end of closure
             // is weak self and the statement above really necessary?
-            
+
             switch uploadResult {
                 case .success(let uploadURL):
                     print("in success")
@@ -64,10 +64,11 @@ class ImageUploadOperation: Operation {
                     print("in error")
                     self.presenter?.onFailedUpload(networkError: networkError, indexPath: self.index)
             }
-            
+
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")
         }
+        
     }
 }

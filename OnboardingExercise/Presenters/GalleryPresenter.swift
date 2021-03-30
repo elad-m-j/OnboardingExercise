@@ -60,7 +60,9 @@ class GalleryPresenter: NSObject, GalleryPresenterProtocol {
     
     private func authorizedFetchFromPhotosLibrary() {
         print("fetch from library is called")
-        self.userPhotoAssets = PHAsset.fetchAssets(with: .image, options: nil)
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.includeAssetSourceTypes = .typeiTunesSynced
+        self.userPhotoAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         DispatchQueue.main.async {
             self.view?.refreshGallery()
         }

@@ -44,6 +44,7 @@ class ImageCell: UICollectionViewCell {
     override func prepareForReuse() {
         self.image.image =  nil
         self.spinner.stopAnimating()
+        super.prepareForReuse()
     }
     
     
