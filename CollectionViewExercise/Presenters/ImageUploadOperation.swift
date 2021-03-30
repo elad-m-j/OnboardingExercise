@@ -14,7 +14,6 @@ protocol ImageUploadOperationDelegate: NSObject {
 
 class ImageUploadOperation: Operation {
     
-    private var waitingTime = DispatchTimeInterval.seconds(1)
     private var index = IndexPath()
     private var base64Image: String = ""
     private weak var presenter: ImageUploadOperationDelegate?
@@ -50,11 +49,12 @@ class ImageUploadOperation: Operation {
         guard !isCancelled else { return }
         state = .executing
         
-        print("'uploading' image from cell: \(index) rwt: \(waitingTime)")
+        print("'uploading' image from cell: \(index)")
         
-        NetworkService.shared.uploadImageToImgur(withBase64String: base64Image) {
+        NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
             [weak self] (uploadResult) in
-            guard let self = self else { return }
+            guard let self = self else { return } // self stays until end of closure
+            // is weak self and the statement above really necessary?
             
             switch uploadResult {
                 case .success(let uploadURL):
@@ -69,7 +69,5 @@ class ImageUploadOperation: Operation {
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")
         }
-        
-        
     }
 }

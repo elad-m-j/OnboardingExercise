@@ -1,17 +1,13 @@
 import UIKit
-import Photos
 
 /// Shows all photos in user's Photos Gallery
 class GalleryCollectionViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
     
-    private var userPhotoAssets: PHFetchResult<PHAsset>? = nil
     private let defaultImageSize = CGSize(width: 300, height: 300)
     
-//    #warning("return this to protocol")
     private var galleryPresenter: GalleryPresenterProtocol = GalleryPresenter()
-    var imagesPerRow = 3.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +38,7 @@ extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
             let squareWidth = Int((collectionView.bounds.width - totalSpace) / CGFloat(numberOfCellsInRow))
             return CGSize(width: squareWidth, height: squareWidth)
         } else {
-            print("could not convert in sizeForItem")
+            print("📕", "could not convert in sizeForItem")
             return CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
         }
     }
@@ -52,13 +48,12 @@ extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
 extension GalleryCollectionViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return userPhotoAssets?.count ?? 0
+        return galleryPresenter.getUserPhotosCount()
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.imageCellReuseIdentifier, for: indexPath) as? ImageCell,
-           let photoAsset = userPhotoAssets?.object(at: indexPath.row) {
-            galleryPresenter.fetchImageFrom(asset: photoAsset, targetSize: defaultImageSize) {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.imageCellReuseIdentifier, for: indexPath) as? ImageCell {
+           galleryPresenter.fetchImageBy(indexPath: indexPath, targetSize: self.defaultImageSize) {
                 (uiImage) in
                 if let uiImage = uiImage {
                     DispatchQueue.main.async {
@@ -70,10 +65,10 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
             if galleryPresenter.isCellLoading(indexPath: indexPath) {
                 cell.startAnimatingSpinner()
                 print(indexPath.row)
-            } // should I stop animating in the else case?
+            } // ? should I stop animating in the else case?
             return cell
         } else {
-            // a better approach for the fail case?
+            // ? a better approach for the fail case?
             return ImageCell()
         }
         
@@ -91,17 +86,15 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
             imageCell.startAnimatingSpinner()
             self.galleryPresenter.cellPressed(uiImage: uiImage, cellOfImage: imageCell, indexPath: indexPath)
         } else {
-            print("error selecting a cell at \(indexPath.row)")
+            print("📕", "error selecting a cell at \(indexPath.row)")
         }
     }
 }
 
 // MARK: - Presenter Delegate
 extension GalleryCollectionViewController: GalleryPresenterDelegate {
-    
-    #warning("can you move this to presenter?")
-    func setAssets(photoAssets: PHFetchResult<PHAsset>){
-        self.userPhotoAssets = photoAssets
+
+    func refreshGallery(){
         self.collectionView.reloadData()
     }
     
@@ -110,7 +103,7 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
             if let cell = self.collectionView.cellForItem(at: indexPath) as? ImageCell {
                     cell.stopAnimatingSpinner()
             } else {
-                print("No cell for index: \(indexPath.row) in: didUploadImageLink")
+                print("📕", "No cell for index: \(indexPath.row) in: didUploadImageLink")
             }
         }
     }
@@ -126,9 +119,8 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
                     self.present(alert, animated: true, completion: nil)
                     cell.stopAnimatingSpinner()
             } else {
-                print("No cell for index: \(indexPath.row) in: didFailWithError")
+                print("📕", "No cell for index: \(indexPath.row) in: didFailWithError")
             }
         }
-        
     }
 }

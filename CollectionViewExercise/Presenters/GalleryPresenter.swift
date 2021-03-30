@@ -10,38 +10,42 @@ import CoreData
 import UIKit // because of the UIImage
 
 protocol GalleryPresenterDelegate: NSObjectProtocol {
-    func setAssets(photoAssets: PHFetchResult<PHAsset>)
+    func refreshGallery()
     func didUploadImageLink(indexPath: IndexPath)
     func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath)
 }
 
+/// how to present a gallery view
 protocol GalleryPresenterProtocol {
     var view: GalleryPresenterDelegate? { get set }
     func viewDidLoad()
     func cellPressed(uiImage: UIImage, cellOfImage imageCell: ImageCell, indexPath: IndexPath)
-    func fetchImageFrom(asset: PHAsset, targetSize:CGSize, completion: @escaping (UIImage?) -> Void)
+    func fetchImageBy(indexPath: IndexPath, targetSize:CGSize, completion: @escaping (UIImage?) -> Void)
     func isCellLoading(indexPath: IndexPath) -> Bool
+    func getUserPhotosCount() -> Int
 }
 
 /// connect between the GalleryViewController and model components: Fetching Photos, NetworkService and saving links to CoreData (LinksDataService)
 class GalleryPresenter: NSObject, GalleryPresenterProtocol {
 
     weak var view: GalleryPresenterDelegate?
+
+    private var userPhotoAssets: PHFetchResult<PHAsset>? = nil
     
     /// assumes not changing order of cells
     private var loadingCells: Set<Int> = []
     
-    private let operationQueue = OperationQueue()
+    private let imageUploadOperationQueue = OperationQueue()
     
     // MARK: - Fetching Photos or from Photos
-    func viewDidLoad(){
-        // add prefetch here?
-        operationQueue.maxConcurrentOperationCount = 1
+    func viewDidLoad() {
+        // ? add prefetch here?
+        imageUploadOperationQueue.maxConcurrentOperationCount = 1
         PHPhotoLibrary.requestAuthorization { (status) in
             switch status {
                 case .authorized:
                     print("Authorized")
-                    self.authorizedFetch()
+                    self.authorizedFetchFromPhotosLibrary()
                 case .denied, .restricted:
                     print("Not allowed")
                 case .notDetermined:
@@ -54,51 +58,58 @@ class GalleryPresenter: NSObject, GalleryPresenterProtocol {
         }
     }
     
-    private func authorizedFetch(){
-        print("fetch is called")
-        let photosCollection: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: nil)
+    private func authorizedFetchFromPhotosLibrary() {
+        print("fetch from library is called")
+        self.userPhotoAssets = PHAsset.fetchAssets(with: .image, options: nil)
         DispatchQueue.main.async {
-            self.view?.setAssets(photoAssets: photosCollection)
+            self.view?.refreshGallery()
         }
     }
     
-    func fetchImageFrom(asset: PHAsset, targetSize: CGSize, completion: @escaping (UIImage?) -> Void) {
+    func fetchImageBy(indexPath: IndexPath, targetSize: CGSize, completion: @escaping (UIImage?) -> Void) {
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
-        PHImageManager.default().requestImage(for: asset,
-                                              targetSize: targetSize,
-                                              contentMode: .aspectFit,
-                                              options: options) {
-            (image, _) in
-            guard let image = image else {return}
-            completion(image)
+        if let photoAsset = userPhotoAssets?.object(at: indexPath.row) {
+            PHImageManager.default().requestImage(for: photoAsset,
+                                                  targetSize: targetSize,
+                                                  contentMode: .aspectFit,
+                                                  options: options) {
+                (image, _) in
+                guard let image = image else {return}
+                completion(image)
+            }
+        } else {
+            print("📕", "Could not get photo asset from index")
         }
     }
     
     // MARK: - Uploading Image
     
     private func getBase64Image(image: UIImage) -> String? {
-        let imageData = image.jpegData(compressionQuality: 0.75) // so it is quicker
-//        let imageData = image.pngData()
+        let imageData = image.jpegData(compressionQuality: 1)
         let base64Image = imageData?.base64EncodedString(options: .lineLength64Characters)
         return base64Image
     }
     
-    func cellPressed(uiImage: UIImage, cellOfImage imageCell: ImageCell, indexPath: IndexPath){
+    func cellPressed(uiImage: UIImage, cellOfImage imageCell: ImageCell, indexPath: IndexPath) {
         guard let base64Image = getBase64Image(image: uiImage) else { return }
         loadingCells.insert(indexPath.row)
          
         let op = ImageUploadOperation(imageUploadDelegate: self, base64Image: base64Image, indexPath: indexPath)
         op.completionBlock = { () in
-            print("finished uploading image from cell: \(indexPath.row)")
+            print("finished uploading image from cell: \(indexPath)")
             self.loadingCells.remove(indexPath.row)
         }
-        operationQueue.addOperation(op)
+        imageUploadOperationQueue.addOperation(op)
     }
     
     // MARK: - Image loading for VC
     func isCellLoading(indexPath: IndexPath) -> Bool {
         return loadingCells.contains(indexPath.row)
+    }
+    
+    func getUserPhotosCount() -> Int {
+        return userPhotoAssets?.count ?? 0
     }
 }
 
@@ -110,7 +121,7 @@ extension GalleryPresenter: ImageUploadOperationDelegate {
         self.view?.didUploadImageLink(indexPath: indexPath)
     }
     
-    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath){
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
         self.view?.didFailWithError(error: networkError.error, additionalMessage: networkError.description ?? "", indexPath: indexPath)
     }
     
@@ -121,7 +132,7 @@ extension GalleryPresenter: ImageUploadOperationDelegate {
             imageLink.linkURL = url
             try context.save()
         } catch  {
-            print("Error saving link to context \(error)")
+            print("📕", "Error saving link to context \(error)")
         }
     }
 }
