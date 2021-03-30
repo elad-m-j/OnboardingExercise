@@ -26,7 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9902D00E25FA5E5D00B3B9D6 /* CollectionViewExercise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionViewExercise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9902D00E25FA5E5D00B3B9D6 /* OnboardingExercise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnboardingExercise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9902D01125FA5E5D00B3B9D6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9902D01825FA5E5D00B3B9D6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9902D01A25FA5E6000B3B9D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,7 +60,7 @@
 		9902D00525FA5E5D00B3B9D6 = {
 			isa = PBXGroup;
 			children = (
-				9902D01025FA5E5D00B3B9D6 /* CollectionViewExercise */,
+				9902D01025FA5E5D00B3B9D6 /* OnboardingExercise */,
 				9902D00F25FA5E5D00B3B9D6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,26 +68,25 @@
 		9902D00F25FA5E5D00B3B9D6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9902D00E25FA5E5D00B3B9D6 /* CollectionViewExercise.app */,
+				9902D00E25FA5E5D00B3B9D6 /* OnboardingExercise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9902D01025FA5E5D00B3B9D6 /* CollectionViewExercise */ = {
+		9902D01025FA5E5D00B3B9D6 /* OnboardingExercise */ = {
 			isa = PBXGroup;
 			children = (
 				99B30F032608ACA60009FC0F /* Presenters */,
 				9977C83925FE7391000E994E /* Model */,
 				9977C84C260341E2000E994E /* View */,
-				9902D01725FA5E5D00B3B9D6 /* Main.storyboard */,
+				99C711C2261357E900254CEF /* Storyboards */,
 				9902D01A25FA5E6000B3B9D6 /* Assets.xcassets */,
 				9902D01125FA5E5D00B3B9D6 /* AppDelegate.swift */,
 				9902D03525FA6E6E00B3B9D6 /* Constants.swift */,
 				9977C80A25FE19E7000E994E /* APICredentials.swift */,
-				9902D01C25FA5E6000B3B9D6 /* LaunchScreen.storyboard */,
 				9902D01F25FA5E6000B3B9D6 /* Info.plist */,
 			);
-			path = CollectionViewExercise;
+			path = OnboardingExercise;
 			sourceTree = "<group>";
 		};
 		9977C83925FE7391000E994E /* Model */ = {
@@ -121,12 +120,21 @@
 			path = Presenters;
 			sourceTree = "<group>";
 		};
+		99C711C2261357E900254CEF /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				9902D01725FA5E5D00B3B9D6 /* Main.storyboard */,
+				9902D01C25FA5E6000B3B9D6 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9902D00D25FA5E5D00B3B9D6 /* CollectionViewExercise */ = {
+		9902D00D25FA5E5D00B3B9D6 /* OnboardingExercise */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9902D02225FA5E6000B3B9D6 /* Build configuration list for PBXNativeTarget "CollectionViewExercise" */;
+			buildConfigurationList = 9902D02225FA5E6000B3B9D6 /* Build configuration list for PBXNativeTarget "OnboardingExercise" */;
 			buildPhases = (
 				9902D00A25FA5E5D00B3B9D6 /* Sources */,
 				9902D00B25FA5E5D00B3B9D6 /* Frameworks */,
@@ -136,9 +144,9 @@
 			);
 			dependencies = (
 			);
-			name = CollectionViewExercise;
+			name = OnboardingExercise;
 			productName = CollectionViewExercise;
-			productReference = 9902D00E25FA5E5D00B3B9D6 /* CollectionViewExercise.app */;
+			productReference = 9902D00E25FA5E5D00B3B9D6 /* OnboardingExercise.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -155,7 +163,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9902D00925FA5E5D00B3B9D6 /* Build configuration list for PBXProject "CollectionViewExercise" */;
+			buildConfigurationList = 9902D00925FA5E5D00B3B9D6 /* Build configuration list for PBXProject "OnboardingExercise" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -168,7 +176,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9902D00D25FA5E5D00B3B9D6 /* CollectionViewExercise */,
+				9902D00D25FA5E5D00B3B9D6 /* OnboardingExercise */,
 			);
 		};
 /* End PBXProject section */
@@ -352,13 +360,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WTDX82D4HW;
-				INFOPLIST_FILE = CollectionViewExercise/Info.plist;
+				INFOPLIST_FILE = OnboardingExercise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.elad-m.CollectionViewExercise";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.elad-m.OnboardingExercise";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -372,13 +380,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WTDX82D4HW;
-				INFOPLIST_FILE = CollectionViewExercise/Info.plist;
+				INFOPLIST_FILE = OnboardingExercise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.elad-m.CollectionViewExercise";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.elad-m.OnboardingExercise";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -388,7 +396,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9902D00925FA5E5D00B3B9D6 /* Build configuration list for PBXProject "CollectionViewExercise" */ = {
+		9902D00925FA5E5D00B3B9D6 /* Build configuration list for PBXProject "OnboardingExercise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9902D02025FA5E6000B3B9D6 /* Debug */,
@@ -397,7 +405,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9902D02225FA5E6000B3B9D6 /* Build configuration list for PBXNativeTarget "CollectionViewExercise" */ = {
+		9902D02225FA5E6000B3B9D6 /* Build configuration list for PBXNativeTarget "OnboardingExercise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9902D02325FA5E6000B3B9D6 /* Debug */,

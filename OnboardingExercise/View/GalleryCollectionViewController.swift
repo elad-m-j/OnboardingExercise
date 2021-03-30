@@ -65,7 +65,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
             if galleryPresenter.isCellLoading(indexPath: indexPath) {
                 cell.startAnimatingSpinner()
                 print(indexPath.row)
-            } // ? should I stop animating in the else case?
+            }
             return cell
         } else {
             // ? a better approach for the fail case?
@@ -102,9 +102,7 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
         DispatchQueue.main.async {
             if let cell = self.collectionView.cellForItem(at: indexPath) as? ImageCell {
                     cell.stopAnimatingSpinner()
-            } else {
-                print("📕", "No cell for index: \(indexPath.row) in: didUploadImageLink")
-            }
+            } // else, cell is not visible and animation stops in prepareForReuse anyway
         }
     }
     
