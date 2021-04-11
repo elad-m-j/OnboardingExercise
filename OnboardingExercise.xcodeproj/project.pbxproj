@@ -21,8 +21,9 @@
 		99B30F052608ACC70009FC0F /* LinksPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F042608ACC70009FC0F /* LinksPresenter.swift */; };
 		99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */; };
 		99B30F0D2608E3FD0009FC0F /* LinksDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */; };
+		99BA5602261D876800845B1A /* PhotosService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BA5601261D876800845B1A /* PhotosService.swift */; };
+		99BA5605261DBCBB00845B1A /* ImageCellPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */; };
 		99C711BF2611ECD200254CEF /* ImageUploadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */; };
-		99DC50CC260B72E5004944F4 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99DC50CB260B72E5004944F4 /* NetworkError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,8 +43,9 @@
 		99B30F042608ACC70009FC0F /* LinksPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksPresenter.swift; sourceTree = "<group>"; };
 		99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryPresenter.swift; sourceTree = "<group>"; };
 		99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksDataService.swift; sourceTree = "<group>"; };
+		99BA5601261D876800845B1A /* PhotosService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosService.swift; sourceTree = "<group>"; };
+		99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCellPresenter.swift; sourceTree = "<group>"; };
 		99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadOperation.swift; sourceTree = "<group>"; };
-		99DC50CB260B72E5004944F4 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,7 +97,7 @@
 				9977C843260274DD000E994E /* DataModel.xcdatamodeld */,
 				9977C83325FE708A000E994E /* NetworkService.swift */,
 				99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */,
-				99DC50CB260B72E5004944F4 /* NetworkError.swift */,
+				99BA5601261D876800845B1A /* PhotosService.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -116,6 +118,7 @@
 				99B30F042608ACC70009FC0F /* LinksPresenter.swift */,
 				99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */,
 				99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */,
+				99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */,
 			);
 			path = Presenters;
 			sourceTree = "<group>";
@@ -203,13 +206,14 @@
 				99B30F0D2608E3FD0009FC0F /* LinksDataService.swift in Sources */,
 				9977C845260274DE000E994E /* DataModel.xcdatamodeld in Sources */,
 				9902D01225FA5E5D00B3B9D6 /* AppDelegate.swift in Sources */,
+				99BA5602261D876800845B1A /* PhotosService.swift in Sources */,
 				99C711BF2611ECD200254CEF /* ImageUploadOperation.swift in Sources */,
 				9977C80B25FE19E7000E994E /* APICredentials.swift in Sources */,
 				99B30F052608ACC70009FC0F /* LinksPresenter.swift in Sources */,
 				99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */,
 				9902D02925FA61F000B3B9D6 /* ImageCell.swift in Sources */,
+				99BA5605261DBCBB00845B1A /* ImageCellPresenter.swift in Sources */,
 				9977C80F25FE4D5E000E994E /* LinksViewController.swift in Sources */,
-				99DC50CC260B72E5004944F4 /* NetworkError.swift in Sources */,
 				9902D03625FA6E6E00B3B9D6 /* Constants.swift in Sources */,
 				9977C83425FE708A000E994E /* NetworkService.swift in Sources */,
 			);

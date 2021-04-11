@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ImageUploadOperationDelegate: NSObject {
+protocol ImageUploadOperationDelegate: AnyObject {
     func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath)
     func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
 }
@@ -16,7 +16,7 @@ class ImageUploadOperation: Operation {
     
     private var index = IndexPath()
     private var base64Image: String = ""
-    private weak var presenter: ImageUploadOperationDelegate?
+    private weak var delegate: ImageUploadOperationDelegate?
     
     private enum State {
         case ready
@@ -29,7 +29,7 @@ class ImageUploadOperation: Operation {
     init(imageUploadDelegate: ImageUploadOperationDelegate, base64Image: String, indexPath: IndexPath) {
         self.index = indexPath
         self.base64Image = base64Image
-        self.presenter = imageUploadDelegate
+        self.delegate = imageUploadDelegate
         super.init()
     }
     
@@ -50,25 +50,33 @@ class ImageUploadOperation: Operation {
         state = .executing
         
         print("uploading image from cell: \(index)")
-        
-        NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
-            [weak self] (uploadResult) in
-            guard let self = self else { return } // self stays until end of closure
-            // is weak self and the statement above really necessary?
-
-            switch uploadResult {
-                case .success(let uploadURL):
-                    print("in success")
-                    self.presenter?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.index)
-                case .failure(let networkError):
-                    print("in error")
-                    self.presenter?.onFailedUpload(networkError: networkError, indexPath: self.index)
-            }
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            self.delegate?.onSuccessfulUpload(uploadURL: "stub", indexPath: self.index)
+            print("finished uploading image from cell: \(self.index.row)")
+            NetworkService.shared.removeLoadingCell(index: self.index.row)
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")
         }
+        
+//        NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
+//            [weak self] (uploadResult) in
+//            guard let self = self else { return } // self stays until end of closure
+//            // is weak self and the statement above really necessary?
+//
+//            switch uploadResult {
+//                case .success(let uploadURL):
+//                    print("in success")
+//                    self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.index)
+//                case .failure(let networkError):
+//                    print("in error")
+//                    self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.index)
+//            }
+//
+//            self.willChangeValue(forKey: "isFinished")
+//            self.state = .finished
+//            self.didChangeValue(forKey: "isFinished")
+//        }
         
     }
 }
