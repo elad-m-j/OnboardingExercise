@@ -8,6 +8,7 @@
 import UIKit
 import Photos
 
+/// wrapper for Photos library
 class PhotosService {
     
     static let shared = PhotosService()
@@ -15,7 +16,7 @@ class PhotosService {
     private init(){}
     
     private var userPhotoAssets: PHFetchResult<PHAsset>? = nil
-    private let defaultImageSize = CGSize(width: 300, height: 300)
+    private let defaultImageSize = CGSize(width: 400, height: 400)
     
     func fetchAllUserAssets(completion: @escaping () -> ()){
         PHPhotoLibrary.requestAuthorization { (status) in
@@ -44,18 +45,20 @@ class PhotosService {
     }
     
 
-    func fetchImageBy(indexPath: IndexPath, isOriginalSize: Bool, completion: @escaping (UIImage) -> ()) {
+    func fetchImageBy(indexPath: IndexPath, isQualityImage: Bool, completion: @escaping (UIImage) -> ()) {
         let options = PHImageRequestOptions()
-        options.resizeMode = isOriginalSize ? .none : .fast
+        options.resizeMode = isQualityImage ? .none : .fast
+        options.deliveryMode =  isQualityImage ? PHImageRequestOptionsDeliveryMode.highQualityFormat: PHImageRequestOptionsDeliveryMode.fastFormat
         if let photoAsset = userPhotoAssets?.object(at: indexPath.row) {
             PHImageManager.default().requestImage(for: photoAsset,
                                                   targetSize: defaultImageSize,
                                                   contentMode: .aspectFit,
                                                   options: options) {
                 (uiImage, info) in
-                if isOriginalSize {
+                if isQualityImage {
                     // reaquestImage call the resultHandler twice, but here we want only the better quality (second call)
-                    guard ((info?[PHImageResultIsDegradedKey] as? Bool) ?? false) else { return }
+                    print("turned down first call")
+                    guard !((info?[PHImageResultIsDegradedKey] as? Bool) ?? false) else { return }
                 }
                 guard let uiImage = uiImage else { return }
                 completion(uiImage)

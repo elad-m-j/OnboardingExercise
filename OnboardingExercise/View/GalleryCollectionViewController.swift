@@ -55,7 +55,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
             return ImageCell()
         }
         cell.delegateVC = self
-        cell.shouldDisplayImage(indexPath: indexPath)
+        cell.shouldDisplayImage(galleryPresenter: galleryPresenter, indexPath: indexPath)
         return cell
     }
 }
@@ -66,10 +66,8 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         print("cell number \(indexPath.row) was pressed")
-        if let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCell {
-            imageCell.pressed(indexPath: indexPath)
-//            imageCell.startAnimatingSpinner()
-//            self.galleryPresenter.cellPressed(uiImage: uiImage, cellOfImage: imageCell, indexPath: indexPath)
+        if let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
+            imageCell.pressed(galleryPresenter: galleryPresenter, indexPath: indexPath)
         } else {
             print("📕", "error selecting a cell at \(indexPath.row)")
         }
@@ -78,7 +76,23 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
 
 // MARK: - Presenter Delegate
 extension GalleryCollectionViewController: GalleryPresenterDelegate {
+    func didUploadImageLink(indexPath: IndexPath) {
+        DispatchQueue.main.async {
+            if let imageCell = self.collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
+                imageCell.stopAnimatingSpinner()
+            } // QUESTION: how would you distinguish between not finding the cell because it is not visible and a conversion error? The same question applies below
+        }
+    }
     
+    func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath) {
+        DispatchQueue.main.async {
+            if let imageCell = self.collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
+                imageCell.stopAnimatingSpinner()
+            }
+            self.showAlert(error: error, additionalMessage: additionalMessage)
+        }
+    }
+
     func refreshGallery(){
         print("refreshGallery")
         collectionView.reloadData()

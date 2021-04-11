@@ -22,7 +22,6 @@
 		99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */; };
 		99B30F0D2608E3FD0009FC0F /* LinksDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */; };
 		99BA5602261D876800845B1A /* PhotosService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BA5601261D876800845B1A /* PhotosService.swift */; };
-		99BA5605261DBCBB00845B1A /* ImageCellPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */; };
 		99C711BF2611ECD200254CEF /* ImageUploadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +43,6 @@
 		99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryPresenter.swift; sourceTree = "<group>"; };
 		99B30F0C2608E3FD0009FC0F /* LinksDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksDataService.swift; sourceTree = "<group>"; };
 		99BA5601261D876800845B1A /* PhotosService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosService.swift; sourceTree = "<group>"; };
-		99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCellPresenter.swift; sourceTree = "<group>"; };
 		99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,7 +116,6 @@
 				99B30F042608ACC70009FC0F /* LinksPresenter.swift */,
 				99B30F072608BA5D0009FC0F /* GalleryPresenter.swift */,
 				99C711BE2611ECD200254CEF /* ImageUploadOperation.swift */,
-				99BA5604261DBCBB00845B1A /* ImageCellPresenter.swift */,
 			);
 			path = Presenters;
 			sourceTree = "<group>";
@@ -212,7 +209,6 @@
 				99B30F052608ACC70009FC0F /* LinksPresenter.swift in Sources */,
 				99B30F082608BA5D0009FC0F /* GalleryPresenter.swift in Sources */,
 				9902D02925FA61F000B3B9D6 /* ImageCell.swift in Sources */,
-				99BA5605261DBCBB00845B1A /* ImageCellPresenter.swift in Sources */,
 				9977C80F25FE4D5E000E994E /* LinksViewController.swift in Sources */,
 				9902D03625FA6E6E00B3B9D6 /* Constants.swift in Sources */,
 				9977C83425FE708A000E994E /* NetworkService.swift in Sources */,

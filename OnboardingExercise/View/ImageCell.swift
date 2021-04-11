@@ -13,8 +13,9 @@ protocol ImageCellViewControllerDelegate: NSObject {
 
 protocol ImageCellProtocol: UICollectionViewCell {
     var delegateVC: ImageCellViewControllerDelegate? { get set }
-    func shouldDisplayImage(indexPath: IndexPath)
-    func pressed(indexPath: IndexPath)
+    func shouldDisplayImage(galleryPresenter: GalleryPresenterProtocol, indexPath: IndexPath)
+    func stopAnimatingSpinner()
+    func pressed(galleryPresenter: GalleryPresenterProtocol, indexPath: IndexPath)
 }
 
 /// Image cell in gallery mainly handles the spinner animation
@@ -22,7 +23,6 @@ class ImageCell: UICollectionViewCell, ImageCellProtocol {
     
     @IBOutlet weak var imageView: UIImageView!
     private lazy var spinner = UIActivityIndicatorView(style: .large)
-    private var presenter: ImageCellPresenterProtocol?
     weak var delegateVC: ImageCellViewControllerDelegate?
     var index: Int?
     
@@ -49,12 +49,9 @@ class ImageCell: UICollectionViewCell, ImageCellProtocol {
     
     // Where is it best to initialize a presenter? no viewDidLoad here
     // and can't add argument to init
-    func shouldDisplayImage(indexPath: IndexPath) {
-        print("shouldDisplay: \(indexPath.row)")
-        presenter = ImageCellPresenter(indexPath: indexPath)
-        presenter?.view = self
+    func shouldDisplayImage(galleryPresenter: GalleryPresenterProtocol, indexPath: IndexPath) {
         index = indexPath.row
-        presenter?.shouldDisplayImage() {
+        galleryPresenter.shouldDisplayImage(indexPath: indexPath) {
             (uiImage) in
             DispatchQueue.main.async {
                 if(NetworkService.shared.isLoadingCell(index: indexPath.row)) {
@@ -66,10 +63,9 @@ class ImageCell: UICollectionViewCell, ImageCellProtocol {
         }
     }
     
-    func pressed(indexPath: IndexPath) {
-//        startAnimatingSpinner()
-        presenter?.cellPressed(indexPath: indexPath)
-        
+    func pressed(galleryPresenter: GalleryPresenterProtocol, indexPath: IndexPath) {
+        startAnimatingSpinner()
+        galleryPresenter.cellPressed(indexPath: indexPath)
     }
     
     func startAnimatingSpinner() {
@@ -80,29 +76,16 @@ class ImageCell: UICollectionViewCell, ImageCellProtocol {
     
     func stopAnimatingSpinner() {
         DispatchQueue.main.async {
-            print("stopAnimatingSpinner: \(String(describing: self.index))")
             self.spinner.stopAnimating()
         }
     }
     
     override func prepareForReuse() {
-        print("reusing cell: \(String(describing: index))")
         index = nil
         imageView.image =  nil
-        presenter = nil
-        stopAnimatingSpinner()
+        if spinner.isAnimating {
+            stopAnimatingSpinner()
+        }
         super.prepareForReuse()
-    }
-}
-
-extension ImageCell: ImageCellPresenterDelegate {
-    
-    func didUploadImageLink(indexPath: IndexPath) {
-//        stopAnimatingSpinner()
-    }
-    
-    func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath) {
-        delegateVC?.showAlert(error: error, additionalMessage: additionalMessage)
-        stopAnimatingSpinner()
     }
 }

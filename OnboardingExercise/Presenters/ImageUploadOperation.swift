@@ -50,33 +50,22 @@ class ImageUploadOperation: Operation {
         state = .executing
         
         print("uploading image from cell: \(index)")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            self.delegate?.onSuccessfulUpload(uploadURL: "stub", indexPath: self.index)
-            print("finished uploading image from cell: \(self.index.row)")
+        
+        NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
+            [weak self] (uploadResult) in
+            guard let self = self else { return } // self stays until end of closure
+            // is weak self and the statement above really necessary?
+
+            switch uploadResult {
+                case .success(let uploadURL):
+                    self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.index)
+                case .failure(let networkError):
+                    self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.index)
+            }
             NetworkService.shared.removeLoadingCell(index: self.index.row)
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")
         }
-        
-//        NetworkService.shared.uploadImageToImgur(withBase64String: self.base64Image) {
-//            [weak self] (uploadResult) in
-//            guard let self = self else { return } // self stays until end of closure
-//            // is weak self and the statement above really necessary?
-//
-//            switch uploadResult {
-//                case .success(let uploadURL):
-//                    print("in success")
-//                    self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.index)
-//                case .failure(let networkError):
-//                    print("in error")
-//                    self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.index)
-//            }
-//
-//            self.willChangeValue(forKey: "isFinished")
-//            self.state = .finished
-//            self.didChangeValue(forKey: "isFinished")
-//        }
-        
     }
 }

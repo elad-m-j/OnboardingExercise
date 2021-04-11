@@ -5,7 +5,7 @@ struct NetworkError: Error {
     let error: Error?
     let description: String?
 }
-/// make post requests of image data (as base64String) to Imgur, and returns via closure the posted image's url
+/// make post requests of image data, manages operation queue and which table cells are loading
 class NetworkService {
     
     static let shared = NetworkService()
