@@ -39,27 +39,23 @@ class PhotosService {
     private func authorizedFetchFromPhotosLibrary(_ completion: () -> ()) {
         print("fetch from library is called")
         let fetchOptions = PHFetchOptions()
-        fetchOptions.includeAssetSourceTypes = .typeUserLibrary
+        fetchOptions.includeAssetSourceTypes = .typeUserLibrary // simulator
+//        fetchOptions.includeAssetSourceTypes = .typeiTunesSynced // physical
         self.userPhotoAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         completion()
     }
     
 
     func fetchImageBy(indexPath: IndexPath, isQualityImage: Bool, completion: @escaping (UIImage) -> ()) {
-        let options = PHImageRequestOptions()
-        options.resizeMode = isQualityImage ? .none : .fast
-        options.deliveryMode =  isQualityImage ? PHImageRequestOptionsDeliveryMode.highQualityFormat: PHImageRequestOptionsDeliveryMode.fastFormat
-        if let photoAsset = userPhotoAssets?.object(at: indexPath.row) {
+        let imageSize = isQualityImage ? PHImageManagerMaximumSize: defaultImageSize
+        let options = getImageRequestOptions(isQualityImage: isQualityImage)
+        if let photoAsset = self.userPhotoAssets?.object(at: indexPath.row) {
             PHImageManager.default().requestImage(for: photoAsset,
-                                                  targetSize: defaultImageSize,
+                                                  targetSize: imageSize,
                                                   contentMode: .aspectFit,
                                                   options: options) {
                 (uiImage, info) in
-                if isQualityImage {
-                    // reaquestImage call the resultHandler twice, but here we want only the better quality (second call)
-                    print("turned down first call")
-                    guard !((info?[PHImageResultIsDegradedKey] as? Bool) ?? false) else { return }
-                }
+//                print("degraded? \(((info?[PHImageResultIsDegradedKey] as? Bool) ?? false))")
                 guard let uiImage = uiImage else { return }
                 completion(uiImage)
             }
@@ -68,7 +64,19 @@ class PhotosService {
         }
     }
     
-    func getUserPhotosCount() -> Int{
+    private func getImageRequestOptions(isQualityImage: Bool) -> PHImageRequestOptions{
+        let options = PHImageRequestOptions()
+        if isQualityImage {
+            options.isSynchronous = true
+            options.resizeMode = .none
+            options.deliveryMode = PHImageRequestOptionsDeliveryMode.highQualityFormat
+        } else {
+            options.resizeMode = .fast
+        }
+        return options
+    }
+    
+    func getUserPhotosCount() -> Int {
         return userPhotoAssets?.count ?? 0
     }
 }

@@ -64,13 +64,14 @@ class ImageCell: UICollectionViewCell, ImageCellProtocol {
     }
     
     func pressed(galleryPresenter: GalleryPresenterProtocol, indexPath: IndexPath) {
-        startAnimatingSpinner()
+        startAnimatingSpinner(doAlsoInMain: {NetworkService.shared.addLoadingCell(index: indexPath.row)})
         galleryPresenter.cellPressed(indexPath: indexPath)
     }
     
-    func startAnimatingSpinner() {
+    func startAnimatingSpinner(doAlsoInMain: @escaping () -> () = {}) {
         DispatchQueue.main.async {
             self.spinner.startAnimating()
+            doAlsoInMain()
         }
     }
     

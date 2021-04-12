@@ -80,7 +80,7 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
         DispatchQueue.main.async {
             if let imageCell = self.collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
                 imageCell.stopAnimatingSpinner()
-            } // QUESTION: how would you distinguish between not finding the cell because it is not visible and a conversion error? The same question applies below
+            } // QUESTION: how would you distinguish between not finding the cell because it is not visible and a conversion error?
         }
     }
     
@@ -104,7 +104,7 @@ extension GalleryCollectionViewController: ImageCellViewControllerDelegate {
     func showAlert(error: Error?, additionalMessage: String) {
         print(additionalMessage)
         print(error ?? "")
-        let alert = UIAlertController(title: "Upload Failed", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Upload Failed", message: additionalMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
         }))
         self.present(alert, animated: true, completion: nil)

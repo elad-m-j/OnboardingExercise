@@ -55,15 +55,8 @@ class GalleryPresenter: GalleryPresenterProtocol {
     }
     
     func cellPressed(indexPath: IndexPath) {
-        DispatchQueue.main.async {
-            NetworkService.shared.addLoadingCell(index: indexPath.row)
-        }
-        PhotosService.shared.fetchImageBy(indexPath: indexPath, isQualityImage: true) {
-            (uiImage) in
-            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
-            let operation = ImageUploadOperation(imageUploadDelegate: self, base64Image: base64Image, indexPath: indexPath)
+            let operation = ImageUploadOperation(imageUploadDelegate: self,  indexPath: indexPath)
             NetworkService.shared.addImageUploadOperation(operation: operation)
-        }
     }
 }
 
