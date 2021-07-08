@@ -1,28 +1,38 @@
 import UIKit
 import CoreData
 
+typealias NetworkResult = Result<String, NetworkError>
+
 struct NetworkError: Error {
     let error: Error?
     let description: String?
 }
+
+protocol NetworkServiceProtocol {
+    func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ())
+    func addImageUploadOperation(operation: ImageUploadOperation)
+    func addLoadingCell(index: Int)
+    func isLoadingCell(index: Int) -> Bool
+    func removeLoadingCell(index: Int)
+}
+
 /// make post requests of image data, manages operation queue and which table cells are loading
-class NetworkService {
+class NetworkService: NetworkServiceProtocol {
     
-    static let shared = NetworkService()
+//    static let shared = NetworkService()
     
-    private init(){
+    init(){
         imageUploadOperationQueue.maxConcurrentOperationCount = 1
     }
     
     private let anonymousImgurUploadURL = "https://api.imgur.com/3/image"
-    typealias NetworkResult = Result<String, NetworkError>
     
     private var loadingCells: Set<Int> = []
     
     // MARK: - upload operation queue
     private let imageUploadOperationQueue = OperationQueue()
     
-    func addImageUploadOperation(operation: ImageUploadOperation){
+    func addImageUploadOperation(operation: ImageUploadOperation) {
         imageUploadOperationQueue.addOperation(operation)
     }
     

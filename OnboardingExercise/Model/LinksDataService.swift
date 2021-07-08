@@ -8,12 +8,16 @@
 import Foundation
 import CoreData
 
-/// Singleton to access CoreData using persistentContainer's context
-class LinksDataService {
+protocol LinksDataServiceProtocol {
+    var persistentContainer: NSPersistentContainer { get }
+    func saveContext ()
+}
 
-    static let shared = LinksDataService()
+class LinksDataService: LinksDataServiceProtocol {
+
+//    static let shared = LinksDataService()
     
-    private init(){}
+//    private init(){}
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "DataModel")

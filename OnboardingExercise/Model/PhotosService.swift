@@ -8,21 +8,45 @@
 import UIKit
 import Photos
 
-/// wrapper for Photos library
-class PhotosService {
+// Q: placement of this enum?
+enum ImageSize {
+    case max
+    case min
+    case iPad
+    case iPhone
     
-    static let shared = PhotosService()
-    
-    private init(){}
+    var value: CGSize {
+        switch self {
+            case .max:
+                return PHImageManagerMaximumSize
+            case .min:
+                return CGSize(width: 100, height: 100)
+            case .iPad:
+                return CGSize(width: 400, height: 400)
+            case .iPhone:
+                return CGSize(width: 200, height: 200)
+        }
+    }
+}
+
+protocol PhotosServiceProtocol {
+    func fetchImageBy(indexPath: IndexPath, imageSize: ImageSize, completion: @escaping (UIImage) -> ())
+    func fetchAllUserAssets(completion: @escaping () -> ())
+    func getUserPhotosCount() -> Int
+}
+
+class PhotosService: PhotosServiceProtocol {
     
     private var userPhotoAssets: PHFetchResult<PHAsset>? = nil
+    
+
+    
     private let defaultImageSize = CGSize(width: 400, height: 400)
     
-    func fetchAllUserAssets(completion: @escaping () -> ()){
+    func fetchAllUserAssets(completion: @escaping () -> ()) {
         PHPhotoLibrary.requestAuthorization { (status) in
             switch status {
                 case .authorized:
-                    print("Authorized")
                     self.authorizedFetchFromPhotosLibrary(completion)
                 case .denied, .restricted:
                     print("Not allowed")
@@ -31,7 +55,7 @@ class PhotosService {
                 case .limited:
                     print("Limited access")
                 @unknown default:
-                    print("default case in permissions")
+                    print("Default case in permissions")
             }
         }
     }
@@ -46,12 +70,11 @@ class PhotosService {
     }
     
 
-    func fetchImageBy(indexPath: IndexPath, isQualityImage: Bool, completion: @escaping (UIImage) -> ()) {
-        let imageSize = isQualityImage ? PHImageManagerMaximumSize: defaultImageSize
-        let options = getImageRequestOptions(isQualityImage: isQualityImage)
+    func fetchImageBy(indexPath: IndexPath, imageSize: ImageSize, completion: @escaping (UIImage) -> ()) {
+        let options = getImageRequestOptions(isQualityImage: imageSize == .max)
         if let photoAsset = self.userPhotoAssets?.object(at: indexPath.row) {
             PHImageManager.default().requestImage(for: photoAsset,
-                                                  targetSize: imageSize,
+                                                  targetSize: imageSize.value,
                                                   contentMode: .aspectFit,
                                                   options: options) {
                 (uiImage, info) in

@@ -5,31 +5,36 @@ class LinksViewController: UIViewController {
 
     @IBOutlet weak var linksTableView: UITableView!
     
-    var links = [ImageLink]()
-    private var linksPresenter: LinkPresenterProtocol = LinksPresenter()
+//    var links = [ImageLink]()
+    private var linksPresenter: LinkPresenterProtocol?
+    private var numberOfLinks: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         linksTableView.delegate = self
         linksTableView.dataSource = self
-        linksPresenter.view = self
-        
-        linksPresenter.loadLinks()
+        self.linksPresenter?.loadLinks()
     }
+    
+    func setPresenter(linksPresenter: LinkPresenterProtocol?) {
+        self.linksPresenter = linksPresenter
+        self.linksPresenter?.view = self
+    }
+    
 }
 
 // MARK: - TableView Data Source
 extension LinksViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        links.count
+        numberOfLinks
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LinkCell", for: indexPath) as UITableViewCell
-        let imageLink = links[indexPath.row]
-        cell.textLabel?.text = imageLink.linkURL
+        let imageLinkURL = linksPresenter?.getLink(at: indexPath)
+        cell.textLabel?.text = imageLinkURL
         return cell
     }
 }
@@ -38,22 +43,20 @@ extension LinksViewController: UITableViewDataSource {
 extension LinksViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let selectedLinkURL = links[indexPath.row].linkURL,
-           let url = URL(string: selectedLinkURL) {
-            UIApplication.shared.open(url, options: [:])
-        } else {
-            print("Could not retrieve link")
-        }
+        linksPresenter?.linkPressed(at: indexPath)
     }
 }
 
 // MARK: - Presenter Delegate
 extension LinksViewController: LinksPresenterDelegate {
-    
-    /// displays the links retrieved by presenter
-    func displayLinks(imageLinks: [ImageLink]) {
-        links = imageLinks
+        
+    func reloadLinks(numberOfLinks: Int) {
+        self.numberOfLinks = numberOfLinks
         linksTableView.reloadData()
+    }
+    
+    func openLinkInBrowser(url: URL) {
+        UIApplication.shared.open(url, options: [:])
     }
     
 }

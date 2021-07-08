@@ -18,6 +18,8 @@ class ImageUploadOperation: Operation {
     
     private var indexPath = IndexPath()
     private weak var delegate: ImageUploadOperationDelegate?
+    private var photosService: PhotosServiceProtocol?
+    private var networkService: NetworkServiceProtocol?
     
     private enum State {
         case ready
@@ -27,9 +29,11 @@ class ImageUploadOperation: Operation {
     
     private var state = State.ready
     
-    init(imageUploadDelegate: ImageUploadOperationDelegate, indexPath: IndexPath) {
+    init(imageUploadDelegate: ImageUploadOperationDelegate, photosService: PhotosServiceProtocol, networkService: NetworkServiceProtocol?, indexPath: IndexPath) {
         self.indexPath = indexPath
         self.delegate = imageUploadDelegate
+        self.photosService = photosService
+        self.networkService = networkService
     }
     
     override var isAsynchronous: Bool {
@@ -55,25 +59,40 @@ class ImageUploadOperation: Operation {
         state = .executing
         
         print("uploading image from cell: \(indexPath)")
-        PhotosService.shared.fetchImageBy(indexPath: self.indexPath, isQualityImage: true) {
-            (uiImage) in
-            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
-            NetworkService.shared.uploadImageToImgur(withBase64String: base64Image) {
-                [weak self] (uploadResult) in
-                guard let self = self else { return } // self stays until end of closure
-                // is weak self and the statement above really necessary?
-
-                switch uploadResult {
-                    case .success(let uploadURL):
-                        self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
-                    case .failure(let networkError):
-                        self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
-                }
-                NetworkService.shared.removeLoadingCell(index: self.indexPath.row)
-                self.willChangeValue(forKey: "isFinished")
-                self.state = .finished
-                self.didChangeValue(forKey: "isFinished")
-            }
+        uploadDemo()
+//        photosService?.fetchImageBy(indexPath: self.indexPath, isQualityImage: true) {
+//            (uiImage) in
+//            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
+//            self.networkService?.uploadImageToImgur(withBase64String: base64Image) {
+//                [weak self] (uploadResult) in
+//                guard let self = self else { return } // self stays until end of closure
+//                // QQQ: is weak self and the statement above really necessary?
+//
+//                switch uploadResult {
+//                    case .success(let uploadURL):
+//                        self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
+//                    case .failure(let networkError):
+//                        self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
+//                }
+//                self.networkService?.removeLoadingCell(index: self.indexPath.row)
+//                self.willChangeValue(forKey: "isFinished")
+//                self.state = .finished
+//                self.didChangeValue(forKey: "isFinished")
+//            }
+//        }
+    }
+    
+    func uploadDemo() {
+        let seconds = 4.0
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+            self.delegate?.onSuccessfulUpload(uploadURL: Constants.testURL, indexPath: self.indexPath)
+            print("demo upload finished of index: \(self.indexPath.row). Not saving link")
+//            self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
+            
+            self.networkService?.removeLoadingCell(index: self.indexPath.row)
+            self.willChangeValue(forKey: "isFinished")
+            self.state = .finished
+            self.didChangeValue(forKey: "isFinished")
         }
     }
 }

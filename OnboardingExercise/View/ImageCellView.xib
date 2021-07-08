@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" reuseIdentifier="ImageCellView" id="4tk-Vn-ua7" customClass="ImageCellView" customModule="OnboardingExercise" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" insetsLayoutMarginsFromSafeArea="NO" id="dtc-3V-T1e">
+                <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="g6t-57-BFz">
+                        <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                    </imageView>
+                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="9tp-vV-riN">
+                        <rect key="frame" x="81.5" y="81.5" width="37" height="37"/>
+                        <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </activityIndicatorView>
+                </subviews>
+                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="g6t-57-BFz" firstAttribute="top" secondItem="dtc-3V-T1e" secondAttribute="top" id="03l-mP-qTr"/>
+                    <constraint firstItem="9tp-vV-riN" firstAttribute="centerY" secondItem="dtc-3V-T1e" secondAttribute="centerY" id="Ogk-HT-bT5"/>
+                    <constraint firstAttribute="bottom" secondItem="g6t-57-BFz" secondAttribute="bottom" id="c9A-w7-5Xq"/>
+                    <constraint firstItem="9tp-vV-riN" firstAttribute="centerX" secondItem="dtc-3V-T1e" secondAttribute="centerX" id="epq-FV-oIF"/>
+                    <constraint firstItem="g6t-57-BFz" firstAttribute="leading" secondItem="dtc-3V-T1e" secondAttribute="leading" id="faQ-c6-XAx"/>
+                    <constraint firstAttribute="trailing" secondItem="g6t-57-BFz" secondAttribute="trailing" id="qls-lq-Byy"/>
+                </constraints>
+            </collectionViewCellContentView>
+            <connections>
+                <outlet property="contentView" destination="dtc-3V-T1e" id="5WZ-5f-83G"/>
+                <outlet property="imageView" destination="g6t-57-BFz" id="9ux-KQ-DOn"/>
+                <outlet property="imageViewNib" destination="g6t-57-BFz" id="jIy-RD-jXP"/>
+                <outlet property="spinnerNib" destination="9tp-vV-riN" id="dZ1-0M-EcX"/>
+            </connections>
+            <point key="canvasLocation" x="65" y="84"/>
+        </collectionViewCell>
+    </objects>
+</document>

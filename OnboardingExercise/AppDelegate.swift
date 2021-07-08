@@ -7,13 +7,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        print("Default document directory: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
+//        window?.rootViewController?.navigationController
         return true
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        LinksDataService.shared.saveContext()
+//        LinksDataService.shared.saveContext()
+        if let rootViewController = window?.rootViewController as? GalleryCollectionViewController {
+            rootViewController.sessionService.linkDataService.saveContext()
+        }
     }
     
 }
-
