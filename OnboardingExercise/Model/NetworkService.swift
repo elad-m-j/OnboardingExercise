@@ -8,7 +8,7 @@ struct NetworkError: Error {
     let description: String?
 }
 
-protocol NetworkServiceProtocol {
+protocol NetworkServiceProtocol: AnyObject {
     func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ())
     func addImageUploadOperation(operation: ImageUploadOperation)
     func addLoadingCell(index: Int)

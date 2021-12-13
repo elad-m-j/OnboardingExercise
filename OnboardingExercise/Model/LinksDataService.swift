@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-protocol LinksDataServiceProtocol {
+protocol LinksDataServiceProtocol: AnyObject {
     var persistentContainer: NSPersistentContainer { get }
     func saveContext ()
 }

@@ -29,7 +29,7 @@ enum ImageSize {
     }
 }
 
-protocol PhotosServiceProtocol {
+protocol PhotosServiceProtocol: AnyObject {
     func fetchImageBy(indexPath: IndexPath, imageSize: ImageSize, completion: @escaping (UIImage) -> ())
     func fetchAllUserAssets(completion: @escaping () -> ())
     func getUserPhotosCount() -> Int
