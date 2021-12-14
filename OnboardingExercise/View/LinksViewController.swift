@@ -5,7 +5,6 @@ class LinksViewController: UIViewController {
 
     @IBOutlet weak var linksTableView: UITableView!
     
-//    var links = [ImageLink]()
     private var linksPresenter: LinkPresenterProtocol?
     private var numberOfLinks: Int = 0
     

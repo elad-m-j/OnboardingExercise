@@ -16,6 +16,7 @@ protocol ImageCellProtocol: UICollectionViewCell {
     var imageCellPresenter: ImageCellPresenterProtocol? { get }
     func shouldDisplayImage(imageCellPresenter: ImageCellPresenterProtocol, indexPath: IndexPath)
     func pressed(indexPath: IndexPath)
+    func stopAnimatingSpinner()
 }
 
 /// Image cell in gallery mainly handles the spinner animation
@@ -24,8 +25,6 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var imageViewNib: UIImageView!
     @IBOutlet weak var spinnerNib: UIActivityIndicatorView!
-    
-//    private lazy var spinner = UIActivityIndicatorView(style: .large)
     
     var imageCellPresenter: ImageCellPresenterProtocol?
     weak var delegateVC: ImageCellViewControllerDelegate?
@@ -48,16 +47,8 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     }
 
     func pressed(indexPath: IndexPath) {
-//        startAnimatingSpinner(doAlsoInMain: {NetworkService.shared.addLoadingCell(index: indexPath.row)})
         imageCellPresenter?.cellPressed(indexPath: indexPath)
     }
-    
-//    func startAnimatingSpinner(doAlsoInMain: @escaping () -> () = {}) {
-//        DispatchQueue.main.async {
-//            self.spinner.startAnimating()
-//            doAlsoInMain()
-//        }
-//    }
     
     override func prepareForReuse() {
         index = nil

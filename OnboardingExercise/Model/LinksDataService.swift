@@ -14,10 +14,6 @@ protocol LinksDataServiceProtocol: AnyObject {
 }
 
 class LinksDataService: LinksDataServiceProtocol {
-
-//    static let shared = LinksDataService()
-    
-//    private init(){}
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "DataModel")

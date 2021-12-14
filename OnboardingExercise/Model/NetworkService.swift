@@ -14,23 +14,20 @@ protocol NetworkServiceProtocol: AnyObject {
     func addLoadingCell(index: Int)
     func isLoadingCell(index: Int) -> Bool
     func removeLoadingCell(index: Int)
+    var presenter: GalleryPresenterNetworkProtocol? {get set}
 }
 
 /// make post requests of image data, manages operation queue and which table cells are loading
 class NetworkService: NetworkServiceProtocol {
-    
-//    static let shared = NetworkService()
+
+    private let anonymousImgurUploadURL = "https://api.imgur.com/3/image"
+    private var loadingCells: Set<Int> = []
+    private let imageUploadOperationQueue = OperationQueue()
+    var presenter: GalleryPresenterNetworkProtocol?
     
     init(){
         imageUploadOperationQueue.maxConcurrentOperationCount = 1
     }
-    
-    private let anonymousImgurUploadURL = "https://api.imgur.com/3/image"
-    
-    private var loadingCells: Set<Int> = []
-    
-    // MARK: - upload operation queue
-    private let imageUploadOperationQueue = OperationQueue()
     
     func addImageUploadOperation(operation: ImageUploadOperation) {
         imageUploadOperationQueue.addOperation(operation)
@@ -47,6 +44,7 @@ class NetworkService: NetworkServiceProtocol {
     
     func removeLoadingCell(index: Int) {
         loadingCells.remove(index)
+        presenter?.removeLoadingCell(index: index)
     }
     
     func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ()) {

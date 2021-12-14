@@ -18,7 +18,6 @@ protocol ImageCellPresenterDelegate: AnyObject {
 
 protocol ImageCellPresenterProtocol: AnyObject {
     var cellView: ImageCellPresenterDelegate? { get set }
-    func viewDidLoad()
     func shouldDisplayImage(indexPath: IndexPath)
     func cellPressed(indexPath: IndexPath)
 }
@@ -40,10 +39,6 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
         self.linksDataService = sessionService.linkDataService
     }
     
-    func viewDidLoad() {
-        // should this stay
-    }
-    
     func shouldDisplayImage(indexPath: IndexPath) {
         photosService.fetchImageBy(indexPath: indexPath, imageSize: .min) {
             (uiImage) in
@@ -58,7 +53,6 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
         let operation = ImageUploadOperation(imageUploadDelegate: self, photosService: photosService, networkService: networkService, indexPath: indexPath)
         networkService.addImageUploadOperation(operation: operation)
         
-        #warning("test this without main threading")
         DispatchQueue.main.async {
             self.networkService.addLoadingCell(index: indexPath.row)
             self.cellView?.startAnimatingSpinner()
@@ -90,7 +84,7 @@ extension ImageCellPresenter: ImageUploadOperationDelegate {
             imageLink.linkURL = url
             try context.save()
         } catch  {
-            print("📕", "Error saving link to context \(error)")
+            print("Error saving link to context \(error)")
         }
     }
     

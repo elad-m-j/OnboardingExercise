@@ -99,6 +99,15 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
         numberOfImages = totalNumberOfPhotos
         collectionView.reloadData()
     }
+    
+    func stopAnimatingSpinnerForCell(index: Int) {
+        guard let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? ImageCellView else {
+            print("failed converting cell")
+            return
+        }
+        cell.stopAnimatingSpinner()
+    }
+    
 }
 
 extension GalleryCollectionViewController: ImageCellViewControllerDelegate {

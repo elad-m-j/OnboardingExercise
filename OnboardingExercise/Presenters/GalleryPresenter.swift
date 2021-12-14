@@ -11,6 +11,7 @@ import UIKit // because of the UIImage
 
 protocol GalleryPresenterDelegate: AnyObject {
     func refreshGallery(_ totalNumberOfPhotos: Int)
+    func stopAnimatingSpinnerForCell(index: Int)
 }
 
 protocol GalleryPresenterProtocol: AnyObject {
@@ -18,15 +19,14 @@ protocol GalleryPresenterProtocol: AnyObject {
     func viewDidLoad()
 }
 
+protocol GalleryPresenterNetworkProtocol: AnyObject {
+    func removeLoadingCell(index: Int)
+}
+
 /// connect between the GalleryViewController and model components: Fetching Photos, NetworkService and saving links to CoreData (LinksDataService)
 class GalleryPresenter: GalleryPresenterProtocol {
 
-    
-
     weak var view: GalleryPresenterDelegate?
-    
-    /// assumes not changing order of cells
-    private var loadingCells: Set<Int> = []
     
     private var photosService: PhotosServiceProtocol
     private var networkService: NetworkServiceProtocol
@@ -39,6 +39,7 @@ class GalleryPresenter: GalleryPresenterProtocol {
         self.photosService = sessionService.photosService
         self.networkService = sessionService.networkService
         self.linksDataService = sessionService.linkDataService
+        self.networkService.presenter = self
         view?.refreshGallery(photosService.getUserPhotosCount())
     }
     
@@ -48,6 +49,13 @@ class GalleryPresenter: GalleryPresenterProtocol {
                 self.view?.refreshGallery(self.photosService.getUserPhotosCount())
             }
         }
+    }
+}
+
+extension GalleryPresenter: GalleryPresenterNetworkProtocol {
+    
+    func removeLoadingCell(index: Int) {
+        view?.stopAnimatingSpinnerForCell(index: index)
     }
 }
 
