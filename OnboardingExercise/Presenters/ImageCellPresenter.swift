@@ -45,7 +45,7 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
     }
     
     func shouldDisplayImage(indexPath: IndexPath) {
-        photosService.fetchImageBy(indexPath: indexPath, isQualityImage: false) {
+        photosService.fetchImageBy(indexPath: indexPath, imageSize: .min) {
             (uiImage) in
             self.cellView?.displayImage(uiImage: uiImage)
             if(self.networkService.isLoadingCell(index: indexPath.row)) {
