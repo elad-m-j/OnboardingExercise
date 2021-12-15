@@ -9,7 +9,6 @@ import UIKit
 
 protocol ImageCellPresenterDelegate: AnyObject {
     func displayImage(uiImage: UIImage)
-    func didUploadImageLink(indexPath: IndexPath)
     func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath)
     
     func startAnimatingSpinner()
@@ -63,31 +62,9 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
 
 extension ImageCellPresenter: ImageUploadOperationDelegate {
     
-    func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath) {
-        if uploadURL == Constants.testURL {
-            cellView?.didUploadImageLink(indexPath: indexPath)
-            return
-        }
-        self.saveLink(linkUrl: uploadURL)
-        cellView?.didUploadImageLink(indexPath: indexPath)
-        print("onSuccessfulUpload index: \(indexPath.row)")
-    }
-    
     func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
         cellView?.didFailWithError(error: networkError.error, additionalMessage: networkError.description ?? "", indexPath: indexPath)
     }
-    
-    private func saveLink(linkUrl url: String) {
-        do {
-            let context = linksDataService.persistentContainer.viewContext
-            let imageLink = ImageLink(context: context)
-            imageLink.linkURL = url
-            try context.save()
-        } catch  {
-            print("Error saving link to context \(error)")
-        }
-    }
-    
     
 }
 

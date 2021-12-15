@@ -51,6 +51,7 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     }
     
     override func prepareForReuse() {
+        if index == 2 {print("\(String(describing: index)): prepare for reuse")}
         index = nil
         imageView.image =  nil
         imageCellPresenter = nil
@@ -75,10 +76,6 @@ extension ImageCellView: ImageCellPresenterDelegate {
             self.imageView.image = uiImage
             self.imageView.contentMode = .scaleAspectFill
         }
-    }
-    
-    func didUploadImageLink(indexPath: IndexPath) {
-        stopAnimatingSpinner()
     }
     
     func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath) {

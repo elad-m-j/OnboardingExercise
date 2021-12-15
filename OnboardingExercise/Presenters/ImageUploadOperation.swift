@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 protocol ImageUploadOperationDelegate: AnyObject {
-    func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath)
     func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
 }
 /// Uploads image from cell index (fetches original image, translates it and upload it)
@@ -58,9 +57,9 @@ class ImageUploadOperation: Operation {
         guard !isCancelled else { return }
         state = .executing
         
-        print("uploading image from cell: \(indexPath)")
+        print("\(indexPath.row): uploading image")
         uploadDemo()
-//        photosService?.fetchImageBy(indexPath: self.indexPath, isQualityImage: true) {
+//        photosService?.fetchImageBy(indexPath: self.indexPath, imageSize: .min) {
 //            (uiImage) in
 //            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
 //            self.networkService?.uploadImageToImgur(withBase64String: base64Image) {
@@ -70,11 +69,11 @@ class ImageUploadOperation: Operation {
 //
 //                switch uploadResult {
 //                    case .success(let uploadURL):
-//                        self.delegate?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
+//                        self.networkService?.onSuccessfulUpload(uploadURL: uploadURL, index: self.indexPath)
 //                    case .failure(let networkError):
 //                        self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
 //                }
-//                self.networkService?.removeLoadingCell(index: self.indexPath.row)
+//
 //                self.willChangeValue(forKey: "isFinished")
 //                self.state = .finished
 //                self.didChangeValue(forKey: "isFinished")
@@ -83,13 +82,10 @@ class ImageUploadOperation: Operation {
     }
     
     func uploadDemo() {
-        let seconds = 4.0
+        let seconds = 2.0
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-            self.delegate?.onSuccessfulUpload(uploadURL: Constants.testURL, indexPath: self.indexPath)
-            print("demo upload finished of index: \(self.indexPath.row). Not saving link")
-//            self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
-            
-            self.networkService?.removeLoadingCell(index: self.indexPath.row)
+            print("\(self.indexPath.row): upload finished (demo)")
+            self.networkService?.onSuccessfulUpload(uploadURL: Constants.testURL, index: self.indexPath)
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")

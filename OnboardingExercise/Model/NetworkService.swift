@@ -13,7 +13,7 @@ protocol NetworkServiceProtocol: AnyObject {
     func addImageUploadOperation(operation: ImageUploadOperation)
     func addLoadingCell(index: Int)
     func isLoadingCell(index: Int) -> Bool
-    func removeLoadingCell(index: Int)
+    func onSuccessfulUpload(uploadURL: String, index: IndexPath)
     var presenter: GalleryPresenterNetworkProtocol? {get set}
 }
 
@@ -39,12 +39,13 @@ class NetworkService: NetworkServiceProtocol {
     }
     
     func isLoadingCell(index: Int) -> Bool {
+        if (index == 2) { print("2: isLoadingCell \(loadingCells.contains(2))")}
         return loadingCells.contains(index)
     }
     
-    func removeLoadingCell(index: Int) {
-        loadingCells.remove(index)
-        presenter?.removeLoadingCell(index: index)
+    func onSuccessfulUpload(uploadURL: String, index: IndexPath) {
+        loadingCells.remove(index.row)
+        presenter?.onSuccessfulImageUpload(uploadURL: uploadURL, index: index.row)
     }
     
     func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ()) {

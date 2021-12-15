@@ -67,6 +67,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if indexPath.row == 2 {print("\(indexPath.row): cellForItem")}
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.imageCellReuseIdentifier, for: indexPath) as? ImageCellView else {
             print("Error: No cell for index: \(indexPath.row) in: cellForItemAt. Creating new ImageCell")
             return ImageCellView()
@@ -82,7 +83,7 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
         
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
-        print("cell number \(indexPath.row) was pressed")
+        print("\(indexPath.row): was pressed")
         if let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
             imageCell.pressed(indexPath: indexPath)
         } else {
@@ -101,11 +102,23 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
     }
     
     func stopAnimatingSpinnerForCell(index: Int) {
-        guard let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? ImageCellView else {
-            print("failed converting cell")
+        var message = "\(index): will stop animating"
+        defer {
+            print("\(message)\n")
+        }
+        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) else {
+            message = "\(index): failed getting cell"
             return
         }
-        cell.stopAnimatingSpinner()
+        guard let customCell = cell as? ImageCellView else {
+            message = "\(index): failed getting cell"
+            return
+        }
+//        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ImageCellView else {
+//            print("\(index): failed converting cell")
+//            return
+//        }
+        customCell.stopAnimatingSpinner()
     }
     
 }

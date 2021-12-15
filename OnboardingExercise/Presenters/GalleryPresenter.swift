@@ -20,7 +20,7 @@ protocol GalleryPresenterProtocol: AnyObject {
 }
 
 protocol GalleryPresenterNetworkProtocol: AnyObject {
-    func removeLoadingCell(index: Int)
+    func onSuccessfulImageUpload(uploadURL: String, index: Int)
 }
 
 /// connect between the GalleryViewController and model components: Fetching Photos, NetworkService and saving links to CoreData (LinksDataService)
@@ -54,8 +54,22 @@ class GalleryPresenter: GalleryPresenterProtocol {
 
 extension GalleryPresenter: GalleryPresenterNetworkProtocol {
     
-    func removeLoadingCell(index: Int) {
+    func onSuccessfulImageUpload(uploadURL: String, index: Int) {
+        if uploadURL != Constants.testURL {
+            self.saveLink(linkUrl: uploadURL)
+        }
         view?.stopAnimatingSpinnerForCell(index: index)
+    }
+    
+    private func saveLink(linkUrl url: String) {
+        do {
+            let context = linksDataService.persistentContainer.viewContext
+            let imageLink = ImageLink(context: context)
+            imageLink.linkURL = url
+            try context.save()
+        } catch  {
+            print("Error saving link to context \(error)")
+        }
     }
 }
 
