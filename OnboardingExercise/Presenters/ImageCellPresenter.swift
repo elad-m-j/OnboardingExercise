@@ -9,15 +9,13 @@ import UIKit
 
 protocol ImageCellPresenterDelegate: AnyObject {
     func displayImage(uiImage: UIImage)
-    func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath)
-    
     func startAnimatingSpinner()
-    func stopAnimatingSpinner()
 }
 
 protocol ImageCellPresenterProtocol: AnyObject {
     var cellView: ImageCellPresenterDelegate? { get set }
-    func shouldDisplayImage(indexPath: IndexPath)
+    func loadCell(indexPath: IndexPath)
+    func shouldDisplaySpinner(indexPath: IndexPath)
     func cellPressed(indexPath: IndexPath)
 }
 
@@ -38,18 +36,22 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
         self.linksDataService = sessionService.linkDataService
     }
     
-    func shouldDisplayImage(indexPath: IndexPath) {
+    func loadCell(indexPath: IndexPath) {
         photosService.fetchImageBy(indexPath: indexPath, imageSize: .min) {
             (uiImage) in
             self.cellView?.displayImage(uiImage: uiImage)
-            if(self.networkService.isLoadingCell(index: indexPath.row)) {
-                self.cellView?.startAnimatingSpinner()
-            }
+        }
+    }
+    
+    func shouldDisplaySpinner(indexPath: IndexPath) {
+        if(self.networkService.isLoadingCell(index: indexPath.row)) {
+            print("\(Thread.isMainThread) \(indexPath.row): should display: true")
+            self.cellView?.startAnimatingSpinner()
         }
     }
     
     func cellPressed(indexPath: IndexPath) {
-        let operation = ImageUploadOperation(imageUploadDelegate: self, photosService: photosService, networkService: networkService, indexPath: indexPath)
+        let operation = ImageUploadOperation(photosService: photosService, networkService: networkService, indexPath: indexPath)
         networkService.addImageUploadOperation(operation: operation)
         
         DispatchQueue.main.async {
@@ -59,12 +61,3 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
     }
     
 }
-
-extension ImageCellPresenter: ImageUploadOperationDelegate {
-    
-    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
-        cellView?.didFailWithError(error: networkError.error, additionalMessage: networkError.description ?? "", indexPath: indexPath)
-    }
-    
-}
-

@@ -13,7 +13,8 @@ protocol NetworkServiceProtocol: AnyObject {
     func addImageUploadOperation(operation: ImageUploadOperation)
     func addLoadingCell(index: Int)
     func isLoadingCell(index: Int) -> Bool
-    func onSuccessfulUpload(uploadURL: String, index: IndexPath)
+    func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath)
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
     var presenter: GalleryPresenterNetworkProtocol? {get set}
 }
 
@@ -39,13 +40,22 @@ class NetworkService: NetworkServiceProtocol {
     }
     
     func isLoadingCell(index: Int) -> Bool {
-        if (index == 2) { print("2: isLoadingCell \(loadingCells.contains(2))")}
+        if (index == 2) { print("\(Thread.isMainThread) 2: isLoadingCell \(loadingCells.contains(2))")}
         return loadingCells.contains(index)
     }
     
-    func onSuccessfulUpload(uploadURL: String, index: IndexPath) {
-        loadingCells.remove(index.row)
-        presenter?.onSuccessfulImageUpload(uploadURL: uploadURL, index: index.row)
+    func removeLoadingCell(index: Int) {
+        loadingCells.remove(index)
+    }
+    
+    func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath) {
+        removeLoadingCell(index: indexPath.row)
+        presenter?.onSuccessfulImageUpload(uploadURL: uploadURL, index: indexPath.row)
+    }
+    
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
+        removeLoadingCell(index: indexPath.row)
+        presenter?.onFailedUpload(networkError: networkError, indexPath: indexPath)
     }
     
     func uploadImageToImgur(withBase64String base64Image: String, completion: @escaping (NetworkResult) -> ()) {

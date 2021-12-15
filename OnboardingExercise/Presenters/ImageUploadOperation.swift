@@ -8,15 +8,11 @@
 import Foundation
 import UIKit
 
-protocol ImageUploadOperationDelegate: AnyObject {
-    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
-}
 /// Uploads image from cell index (fetches original image, translates it and upload it)
 /// "operations are always executed on a separate thread" https://developer.apple.com/documentation/foundation/operationqueue
 class ImageUploadOperation: Operation {
     
     private var indexPath = IndexPath()
-    private weak var delegate: ImageUploadOperationDelegate?
     private var photosService: PhotosServiceProtocol?
     private var networkService: NetworkServiceProtocol?
     
@@ -28,9 +24,8 @@ class ImageUploadOperation: Operation {
     
     private var state = State.ready
     
-    init(imageUploadDelegate: ImageUploadOperationDelegate, photosService: PhotosServiceProtocol, networkService: NetworkServiceProtocol?, indexPath: IndexPath) {
+    init(photosService: PhotosServiceProtocol, networkService: NetworkServiceProtocol?, indexPath: IndexPath) {
         self.indexPath = indexPath
-        self.delegate = imageUploadDelegate
         self.photosService = photosService
         self.networkService = networkService
     }
@@ -59,33 +54,36 @@ class ImageUploadOperation: Operation {
         
         print("\(indexPath.row): uploading image")
         uploadDemo()
-//        photosService?.fetchImageBy(indexPath: self.indexPath, imageSize: .min) {
-//            (uiImage) in
-//            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
-//            self.networkService?.uploadImageToImgur(withBase64String: base64Image) {
-//                [weak self] (uploadResult) in
-//                guard let self = self else { return } // self stays until end of closure
-//                // QQQ: is weak self and the statement above really necessary?
-//
-//                switch uploadResult {
-//                    case .success(let uploadURL):
-//                        self.networkService?.onSuccessfulUpload(uploadURL: uploadURL, index: self.indexPath)
-//                    case .failure(let networkError):
-//                        self.delegate?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
-//                }
-//
-//                self.willChangeValue(forKey: "isFinished")
-//                self.state = .finished
-//                self.didChangeValue(forKey: "isFinished")
-//            }
-//        }
+//        realUpload()
     }
     
-    func uploadDemo() {
-        let seconds = 2.0
+    private func realUpload(){
+        photosService?.fetchImageBy(indexPath: self.indexPath, imageSize: .min) {
+            (uiImage) in
+            guard let base64Image = self.getBase64Image(image: uiImage) else { return }
+            self.networkService?.uploadImageToImgur(withBase64String: base64Image) {
+                [weak self] (uploadResult) in
+                guard let self = self else { return } // self stays until end of closure
+                // QQQ: is weak self and the statement above really necessary?
+
+                switch uploadResult {
+                    case .success(let uploadURL):            self.networkService?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
+                    case .failure(let networkError):
+                        self.networkService?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
+                }
+
+                self.willChangeValue(forKey: "isFinished")
+                self.state = .finished
+                self.didChangeValue(forKey: "isFinished")
+            }
+        }
+    }
+    
+    private func uploadDemo() {
+        let seconds = 4.0
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-            print("\(self.indexPath.row): upload finished (demo)")
-            self.networkService?.onSuccessfulUpload(uploadURL: Constants.testURL, index: self.indexPath)
+            print("\(Thread.isMainThread) \(self.indexPath.row): upload finished (demo)")
+            self.networkService?.onSuccessfulUpload(uploadURL: Constants.testURL, indexPath: self.indexPath)
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")

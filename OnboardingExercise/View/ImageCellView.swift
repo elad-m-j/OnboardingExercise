@@ -7,19 +7,14 @@
 
 import UIKit
 
-protocol ImageCellViewControllerDelegate: NSObject {
-    func showAlert(error: Error?, additionalMessage: String)
-}
-
 protocol ImageCellProtocol: UICollectionViewCell {
-    var delegateVC: ImageCellViewControllerDelegate? { get set }
     var imageCellPresenter: ImageCellPresenterProtocol? { get }
-    func shouldDisplayImage(imageCellPresenter: ImageCellPresenterProtocol, indexPath: IndexPath)
+    func load(imageCellPresenter: ImageCellPresenterProtocol, indexPath: IndexPath)
+    func willDisplay(indexPath: IndexPath)
+    func didEndDisplaying()
     func pressed(indexPath: IndexPath)
-    func stopAnimatingSpinner()
 }
 
-/// Image cell in gallery mainly handles the spinner animation
 class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     
     @IBOutlet weak var imageView: UIImageView!
@@ -27,7 +22,6 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     @IBOutlet weak var spinnerNib: UIActivityIndicatorView!
     
     var imageCellPresenter: ImageCellPresenterProtocol?
-    weak var delegateVC: ImageCellViewControllerDelegate?
     var index: Int?
     
     let nibName = "ImageCellView"
@@ -40,13 +34,28 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
         self.imageCellPresenter = imageCellPresenter
     }
     
-    func shouldDisplayImage(imageCellPresenter: ImageCellPresenterProtocol, indexPath: IndexPath) {
+    func load(imageCellPresenter: ImageCellPresenterProtocol, indexPath: IndexPath) {
         index = indexPath.row
         self.imageCellPresenter = imageCellPresenter
-        imageCellPresenter.shouldDisplayImage(indexPath: indexPath)
+        imageCellPresenter.loadCell(indexPath: indexPath)
+    }
+    
+    func willDisplay(indexPath: IndexPath) {
+        guard let cellPresenter = imageCellPresenter else {
+            print("no cell presenter mainThread?:\(Thread.isMainThread)")
+            return
+        }
+        cellPresenter.shouldDisplaySpinner(indexPath: indexPath)
+    }
+    
+    func didEndDisplaying() {
+        if spinnerNib.isAnimating {
+            stopAnimatingSpinner()
+        }
     }
 
     func pressed(indexPath: IndexPath) {
+        print("\(indexPath.row): was pressed")
         imageCellPresenter?.cellPressed(indexPath: indexPath)
     }
     
@@ -55,17 +64,7 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
         index = nil
         imageView.image =  nil
         imageCellPresenter = nil
-        if spinnerNib.isAnimating {
-            // Q:assuming main thread here?
-            stopAnimatingSpinner()
-        }
         super.prepareForReuse()
-    }
-}
-
-extension ImageCellView: ImageCellViewControllerDelegate {
-    func showAlert(error: Error?, additionalMessage: String) {
-        print("should show alert in GalleryVC")
     }
 }
 
@@ -76,11 +75,6 @@ extension ImageCellView: ImageCellPresenterDelegate {
             self.imageView.image = uiImage
             self.imageView.contentMode = .scaleAspectFill
         }
-    }
-    
-    func didFailWithError(error: Error?, additionalMessage: String, indexPath: IndexPath) {
-        print("didFailWithError: \(String(describing: type(of: self)))")
-        stopAnimatingSpinner()
     }
     
     func startAnimatingSpinner() {

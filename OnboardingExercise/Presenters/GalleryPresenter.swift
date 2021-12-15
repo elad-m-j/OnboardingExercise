@@ -9,24 +9,25 @@ import Photos
 import CoreData
 import UIKit // because of the UIImage
 
-protocol GalleryPresenterDelegate: AnyObject {
+protocol GalleryPresenterDelegateProtocol: AnyObject {
     func refreshGallery(_ totalNumberOfPhotos: Int)
     func stopAnimatingSpinnerForCell(index: Int)
+    func showAlert(error: Error?, additionalMessage: String)
 }
 
 protocol GalleryPresenterProtocol: AnyObject {
-    var view: GalleryPresenterDelegate? { get set }
     func viewDidLoad()
 }
 
 protocol GalleryPresenterNetworkProtocol: AnyObject {
     func onSuccessfulImageUpload(uploadURL: String, index: Int)
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
 }
 
 /// connect between the GalleryViewController and model components: Fetching Photos, NetworkService and saving links to CoreData (LinksDataService)
 class GalleryPresenter: GalleryPresenterProtocol {
 
-    weak var view: GalleryPresenterDelegate?
+    weak var view: GalleryPresenterDelegateProtocol?
     
     private var photosService: PhotosServiceProtocol
     private var networkService: NetworkServiceProtocol
@@ -34,7 +35,7 @@ class GalleryPresenter: GalleryPresenterProtocol {
    
     // MARK: - Fetching Photos or from Photos
     
-    init(view: GalleryPresenterDelegate?, sessionService: SessionService){
+    init(view: GalleryPresenterDelegateProtocol?, sessionService: SessionService){
         self.view = view
         self.photosService = sessionService.photosService
         self.networkService = sessionService.networkService
@@ -53,6 +54,11 @@ class GalleryPresenter: GalleryPresenterProtocol {
 }
 
 extension GalleryPresenter: GalleryPresenterNetworkProtocol {
+    
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
+        view?.showAlert(error: networkError.error, additionalMessage: networkError.description ?? "")
+        view?.stopAnimatingSpinnerForCell(index: indexPath.row)
+    }
     
     func onSuccessfulImageUpload(uploadURL: String, index: Int) {
         if uploadURL != Constants.testURL {
