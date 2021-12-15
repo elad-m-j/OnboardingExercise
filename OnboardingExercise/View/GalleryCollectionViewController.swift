@@ -32,6 +32,12 @@ class GalleryCollectionViewController: UIViewController {
             }
         }
     }
+    
+    private func printIf2(index: Int, message: String) {
+        if (index == 2) {
+            print("\(Thread.isMainThread) \(message)")
+        }
+    }
 }
 
 // MARK: - FlowLayout
@@ -72,8 +78,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
             print("Error: No cell for index: \(indexPath.row) in: cellForItemAt. Creating new ImageCell")
             return ImageCellView()
         }
-        cell.delegateVC = self
-        cell.shouldDisplayImage(imageCellPresenter: ImageCellPresenter(view: cell, sessionService: sessionService), indexPath: indexPath)
+        cell.load(imageCellPresenter: ImageCellPresenter(view: cell, sessionService: sessionService), indexPath: indexPath)
         return cell
     }
 }
@@ -83,17 +88,37 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
         
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
-        print("\(indexPath.row): was pressed")
         if let imageCell = collectionView.cellForItem(at: indexPath) as? ImageCellProtocol {
             imageCell.pressed(indexPath: indexPath)
         } else {
             print("Error: selecting a cell at \(indexPath.row)")
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let customCell = cell as? ImageCellView else {
+            let message = "\(indexPath.row): failed casting cell"
+            printIf2(index: indexPath.row, message: message)
+            return
+        }
+        printIf2(index: indexPath.row, message: "\(indexPath.row): willDisplay")
+        customCell.willDisplay(indexPath: indexPath)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let customCell = cell as? ImageCellView else {
+            let message = "\(indexPath.row): failed casting cell"
+            printIf2(index: indexPath.row, message: message)
+            return
+        }
+        printIf2(index: indexPath.row, message: "\(indexPath.row): didEndDisplaying")
+        customCell.didEndDisplaying()
+    }
+    
 }
 
 // MARK: - Presenter Delegate
-extension GalleryCollectionViewController: GalleryPresenterDelegate {
+extension GalleryCollectionViewController: GalleryPresenterDelegateProtocol {
 
     func refreshGallery(_ totalNumberOfPhotos: Int){
         print("refreshGallery")
@@ -102,28 +127,14 @@ extension GalleryCollectionViewController: GalleryPresenterDelegate {
     }
     
     func stopAnimatingSpinnerForCell(index: Int) {
-        var message = "\(index): will stop animating"
-        defer {
-            print("\(message)\n")
-        }
-        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) else {
-            message = "\(index): failed getting cell"
+        let defaultMessage = "\(Thread.isMainThread) \(index): will stop animating"
+        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)), let customCell = cell as? ImageCellView else {
+            printIf2(index: index, message: defaultMessage + " failed getting or casting cell")
             return
         }
-        guard let customCell = cell as? ImageCellView else {
-            message = "\(index): failed getting cell"
-            return
-        }
-//        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ImageCellView else {
-//            print("\(index): failed converting cell")
-//            return
-//        }
+        printIf2(index: index, message: defaultMessage)
         customCell.stopAnimatingSpinner()
     }
-    
-}
-
-extension GalleryCollectionViewController: ImageCellViewControllerDelegate {
     
     func showAlert(error: Error?, additionalMessage: String) {
         if self.isBeingPresented {
