@@ -30,7 +30,7 @@ class GalleryPresenter: GalleryPresenterProtocol {
     weak var view: GalleryPresenterDelegateProtocol?
     
     private var photosService: PhotosServiceProtocol
-    private var networkService: NetworkServiceProtocol
+    private var networkService: NetworkGalleryPresenterProtocol
     private var linksDataService: LinksDataServiceProtocol
    
     // MARK: - Fetching Photos or from Photos

@@ -53,9 +53,9 @@ class ImageCellPresenter: ImageCellPresenterProtocol {
     func cellPressed(indexPath: IndexPath) {
         let operation = ImageUploadOperation(photosService: photosService, networkService: networkService, indexPath: indexPath)
         networkService.addImageUploadOperation(operation: operation)
+        self.networkService.addLoadingCell(index: indexPath.row)
         
         DispatchQueue.main.async {
-            self.networkService.addLoadingCell(index: indexPath.row)
             self.cellView?.startAnimatingSpinner()
         }
     }

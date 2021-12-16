@@ -73,7 +73,6 @@ extension GalleryCollectionViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.row == 2 {print("\(indexPath.row): cellForItem")}
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.imageCellReuseIdentifier, for: indexPath) as? ImageCellView else {
             print("Error: No cell for index: \(indexPath.row) in: cellForItemAt. Creating new ImageCell")
             return ImageCellView()
@@ -101,7 +100,6 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
             printIf2(index: indexPath.row, message: message)
             return
         }
-        printIf2(index: indexPath.row, message: "\(indexPath.row): willDisplay")
         customCell.willDisplay(indexPath: indexPath)
     }
 
@@ -111,7 +109,6 @@ extension GalleryCollectionViewController: UICollectionViewDelegate {
             printIf2(index: indexPath.row, message: message)
             return
         }
-        printIf2(index: indexPath.row, message: "\(indexPath.row): didEndDisplaying")
         customCell.didEndDisplaying()
     }
     
@@ -128,16 +125,17 @@ extension GalleryCollectionViewController: GalleryPresenterDelegateProtocol {
     
     func stopAnimatingSpinnerForCell(index: Int) {
         let defaultMessage = "\(Thread.isMainThread) \(index): will stop animating"
-        guard let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)), let customCell = cell as? ImageCellView else {
-            printIf2(index: index, message: defaultMessage + " failed getting or casting cell")
-            return
+        DispatchQueue.main.async {
+            guard let cell = self.collectionView.cellForItem(at: IndexPath(item: index, section: 0)), let customCell = cell as? ImageCellView else {
+                self.printIf2(index: index, message: defaultMessage + " failed getting or casting cell")
+                return
+            }
+            customCell.stopAnimatingSpinner()
         }
-        printIf2(index: index, message: defaultMessage)
-        customCell.stopAnimatingSpinner()
     }
     
     func showAlert(error: Error?, additionalMessage: String) {
-        if self.isBeingPresented {
+        if self.navigationController?.topViewController == self {
             print(additionalMessage)
             print(error ?? "")
             let alert = UIAlertController(title: "Upload Failed", message: additionalMessage, preferredStyle: .alert)

@@ -53,12 +53,12 @@ class ImageUploadOperation: Operation {
         state = .executing
         
         print("\(indexPath.row): uploading image")
-        uploadDemo()
-//        realUpload()
+//        uploadDemo()
+        realUpload()
     }
     
     private func realUpload(){
-        photosService?.fetchImageBy(indexPath: self.indexPath, imageSize: .min) {
+        photosService?.fetchImageBy(indexPath: self.indexPath, imageSize: .max) {
             (uiImage) in
             guard let base64Image = self.getBase64Image(image: uiImage) else { return }
             self.networkService?.uploadImageToImgur(withBase64String: base64Image) {
@@ -67,7 +67,8 @@ class ImageUploadOperation: Operation {
                 // QQQ: is weak self and the statement above really necessary?
 
                 switch uploadResult {
-                    case .success(let uploadURL):            self.networkService?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
+                    case .success(let uploadURL):
+                        self.networkService?.onSuccessfulUpload(uploadURL: uploadURL, indexPath: self.indexPath)
                     case .failure(let networkError):
                         self.networkService?.onFailedUpload(networkError: networkError, indexPath: self.indexPath)
                 }
@@ -84,6 +85,7 @@ class ImageUploadOperation: Operation {
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
             print("\(Thread.isMainThread) \(self.indexPath.row): upload finished (demo)")
             self.networkService?.onSuccessfulUpload(uploadURL: Constants.testURL, indexPath: self.indexPath)
+//            self.networkService?.onFailedUpload(networkError: NetworkError(error: nil, description: "intentional error"), indexPath: self.indexPath)
             self.willChangeValue(forKey: "isFinished")
             self.state = .finished
             self.didChangeValue(forKey: "isFinished")

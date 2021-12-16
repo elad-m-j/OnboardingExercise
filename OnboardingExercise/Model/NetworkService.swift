@@ -14,12 +14,15 @@ protocol NetworkServiceProtocol: AnyObject {
     func addLoadingCell(index: Int)
     func isLoadingCell(index: Int) -> Bool
     func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath)
-    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)
+    func onFailedUpload(networkError: NetworkError, indexPath: IndexPath)    
+}
+
+protocol NetworkGalleryPresenterProtocol: AnyObject {
     var presenter: GalleryPresenterNetworkProtocol? {get set}
 }
 
 /// make post requests of image data, manages operation queue and which table cells are loading
-class NetworkService: NetworkServiceProtocol {
+class NetworkService: NetworkServiceProtocol, NetworkGalleryPresenterProtocol {
 
     private let anonymousImgurUploadURL = "https://api.imgur.com/3/image"
     private var loadingCells: Set<Int> = []
@@ -40,7 +43,6 @@ class NetworkService: NetworkServiceProtocol {
     }
     
     func isLoadingCell(index: Int) -> Bool {
-        if (index == 2) { print("\(Thread.isMainThread) 2: isLoadingCell \(loadingCells.contains(2))")}
         return loadingCells.contains(index)
     }
     
@@ -49,11 +51,13 @@ class NetworkService: NetworkServiceProtocol {
     }
     
     func onSuccessfulUpload(uploadURL: String, indexPath: IndexPath) {
+        print("\(indexPath.row): finished uploading successfully")
         removeLoadingCell(index: indexPath.row)
         presenter?.onSuccessfulImageUpload(uploadURL: uploadURL, index: indexPath.row)
     }
     
     func onFailedUpload(networkError: NetworkError, indexPath: IndexPath) {
+        print("\(indexPath.row): upload failed")
         removeLoadingCell(index: indexPath.row)
         presenter?.onFailedUpload(networkError: networkError, indexPath: indexPath)
     }

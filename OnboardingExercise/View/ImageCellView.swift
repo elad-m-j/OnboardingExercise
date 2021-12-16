@@ -60,7 +60,6 @@ class ImageCellView: UICollectionViewCell, ImageCellProtocol {
     }
     
     override func prepareForReuse() {
-        if index == 2 {print("\(String(describing: index)): prepare for reuse")}
         index = nil
         imageView.image =  nil
         imageCellPresenter = nil
@@ -78,11 +77,15 @@ extension ImageCellView: ImageCellPresenterDelegate {
     }
     
     func startAnimatingSpinner() {
-        self.spinnerNib.startAnimating()
+        DispatchQueue.main.async {
+            self.spinnerNib.startAnimating()
+        }
     }
     
     func stopAnimatingSpinner() {
-        self.spinnerNib.stopAnimating()
+        DispatchQueue.main.async {
+            self.spinnerNib.stopAnimating()
+        }
         
     }
 
